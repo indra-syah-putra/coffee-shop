@@ -1,0 +1,72 @@
+<?php
+
+use App\Http\Controllers\BookingController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\BookingController as AdminBookingController;
+use App\Http\Controllers\Admin\MenuItemController;
+use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Models\MenuItem;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+
+Route::get('/', function () {
+    return Inertia::render('Welcome', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+        'menuItems' => MenuItem::where('active', true)->orderBy('category')->orderBy('name')->get(),
+    ]);
+});
+
+// Admin login portal
+Route::middleware('guest')->prefix('dashboardadmin')->name('admin.')->group(function () {
+    Route::get('/login', [App\Http\Controllers\Admin\Auth\AdminLoginController::class, 'create'])->name('login');
+    Route::post('/login', [App\Http\Controllers\Admin\Auth\AdminLoginController::class, 'store'])->name('login.post');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Bookings
+    Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
+    Route::get('/bookings/{booking}/payment', [BookingController::class, 'payment'])->name('bookings.payment');
+    Route::post('/bookings/{booking}/pay', [BookingController::class, 'pay'])->name('bookings.pay');
+    Route::get('/my-bookings', [BookingController::class, 'myBookings'])->name('my-bookings');
+
+    // Cart
+    Route::get('/cart', function () {
+        return Inertia::render('Cart/Index');
+    })->name('cart');
+
+    // Checkout
+    Route::get('/checkout', function () {
+        return Inertia::render('Checkout/Index');
+    })->name('checkout');
+
+    // Orders
+    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::get('/my-orders', [OrderController::class, 'myOrders'])->name('my-orders');
+});
+
+// Admin dashboard
+Route::middleware('admin')->prefix('dashboardadmin')->name('admin.')->group(function () {
+    Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/specials', function () {
+        return Inertia::render('Admin/SpecialsDashboard');
+    })->name('specials');
+    Route::get('/menu-items', [MenuItemController::class, 'index'])->name('menu-items.index');
+    Route::post('/menu-items', [MenuItemController::class, 'store'])->name('menu-items.store');
+    Route::put('/menu-items/{menuItem}', [MenuItemController::class, 'update'])->name('menu-items.update');
+    Route::delete('/menu-items/{menuItem}', [MenuItemController::class, 'destroy'])->name('menu-items.destroy');
+    Route::get('/bookings', [AdminBookingController::class, 'index'])->name('bookings.index');
+    Route::put('/bookings/{booking}', [AdminBookingController::class, 'update'])->name('bookings.update');
+    Route::delete('/bookings/{booking}', [AdminBookingController::class, 'destroy'])->name('bookings.destroy');
+    Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
+    Route::put('/orders/{order}', [AdminOrderController::class, 'update'])->name('orders.update');
+    Route::delete('/orders/{order}', [AdminOrderController::class, 'destroy'])->name('orders.destroy');
+});
+
+require __DIR__.'/auth.php';

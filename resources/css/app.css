@@ -1,0 +1,134 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --espresso: #3E2723;
+    --espresso-dark: #261712;
+    --cream: #FFFFFF;
+    --cream-dark: #FFFAF5;
+    --gold: #D4AF37;
+    --gold-light: #E6C75A;
+    --light-brown: #8D6E63;
+    --light-brown-light: #A1887F;
+}
+
+body {
+    background-color: var(--cream-dark);
+    color: var(--espresso);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+}
+
+.glass-nav {
+    background: rgba(62, 39, 35, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+}
+
+.text-gold {
+    color: var(--gold);
+}
+
+.bg-gold {
+    background-color: var(--gold);
+}
+
+.border-gold {
+    border-color: var(--gold);
+}
+
+.text-light-brown {
+    color: var(--light-brown);
+}
+
+.bg-light-brown {
+    background-color: var(--light-brown);
+}
+
+.border-light-brown {
+    border-color: var(--light-brown);
+}
+
+.text-espresso {
+    color: var(--espresso);
+}
+
+.bg-espresso {
+    background-color: var(--espresso);
+}
+
+.border-espresso {
+    border-color: var(--espresso);
+}
+
+.bg-cream {
+    background-color: var(--cream);
+}
+
+.text-cream {
+    color: var(--cream);
+}
+
+.border-cream {
+    border-color: var(--cream);
+}
+
+.bg-cream-dark {
+    background-color: var(--cream-dark);
+}
+
+.text-cream-dark {
+    color: var(--cream-dark);
+}
+
+.btn-premium {
+    @apply px-8 py-3 rounded-full transition-all duration-300 font-semibold;
+    background-color: var(--gold);
+    color: var(--espresso);
+}
+
+.btn-premium:hover {
+    background-color: var(--gold-light);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+}
+
+.card-premium {
+    @apply rounded-2xl overflow-hidden transition-all duration-500;
+    background: white;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+}
+
+.card-premium:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(62, 39, 35, 0.12);
+}
+
+.section-spacing {
+    @apply py-24 px-6 md:px-12 lg:px-24;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--cream-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--light-brown);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--espresso);
+}
