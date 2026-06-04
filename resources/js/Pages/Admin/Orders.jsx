@@ -23,10 +23,16 @@ export default function AdminOrders({ orders }) {
         });
     };
 
+    const variantLabel = (item) => {
+        const parts = [];
+        if (item.size) parts.push(item.size);
+        if (item.temperature) parts.push(item.temperature === 'hot' ? 'Panas' : 'Dingin');
+        if (item.sugar_level) parts.push('Gula ' + item.sugar_level);
+        return parts.length > 0 ? parts.join(' · ') : null;
+    };
+
     return (
-        <AdminLayout
-            header={<h2 className="font-semibold text-xl text-espresso leading-tight">Kelola Pesanan</h2>}
-        >
+        <AdminLayout header={<h2 className="font-semibold text-xl text-espresso leading-tight">Kelola Pesanan</h2>}>
             <Head title="Admin | Orders" />
 
             <div className="bg-white rounded-2xl border border-gold/10 p-6 shadow-sm">
@@ -52,7 +58,7 @@ export default function AdminOrders({ orders }) {
                                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
                                             {order.user.name?.charAt(0)?.toUpperCase() || '?'}
                                         </div>
-                                        <div>
+                                        <div className="flex-1">
                                             <h4 className="font-bold text-espresso">{order.user.name}</h4>
                                             <div className="flex items-center space-x-2 mt-1">
                                                 <span className="text-espresso/60 text-sm">{new Date(order.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
@@ -61,21 +67,22 @@ export default function AdminOrders({ orders }) {
                                             </div>
                                             <div className="flex items-center space-x-3 mt-2">
                                                 <span className="text-gold font-bold">Rp {Number(order.total).toLocaleString('id-ID')}</span>
+                                                {order.discount > 0 && <span className="text-emerald-600 text-xs">(Diskon Rp {Number(order.discount).toLocaleString('id-ID')})</span>}
                                                 <span className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${status.bg} ${status.text}`}>
                                                     <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`} />
                                                     <span>{status.label}</span>
                                                 </span>
                                             </div>
                                             {order.items && order.items.length > 0 && (
-                                                <div className="mt-2 flex items-center flex-wrap gap-1.5">
-                                                    {order.items.slice(0, 3).map((item, i) => (
-                                                        <span key={i} className="text-[11px] bg-white px-2 py-0.5 rounded-md border border-gold/10 text-espresso/60">
-                                                            {item.name} x{item.quantity || 1}
-                                                        </span>
+                                                <div className="mt-2 space-y-1">
+                                                    {order.items.map((item, i) => (
+                                                        <div key={i} className="text-[11px] bg-white px-2 py-1 rounded-md border border-gold/5 text-espresso/60 flex items-center gap-2">
+                                                            <span className="font-medium text-espresso/80">{item.name}</span>
+                                                            {variantLabel(item) && <span className="text-espresso/30">{variantLabel(item)}</span>}
+                                                            <span>x{item.quantity}</span>
+                                                            <span className="text-gold/60">Rp {(item.price * item.quantity).toLocaleString('id-ID')}</span>
+                                                        </div>
                                                     ))}
-                                                    {order.items.length > 3 && (
-                                                        <span className="text-[11px] text-espresso/40">+{order.items.length - 3} lainnya</span>
-                                                    )}
                                                 </div>
                                             )}
                                         </div>
@@ -94,9 +101,7 @@ export default function AdminOrders({ orders }) {
                                             <option value="cancelled">Dibatalkan</option>
                                         </select>
                                         <button onClick={() => { if (confirm('Hapus pesanan ini?')) router.delete(route('admin.orders.destroy', order.id), { preserveScroll: true }); }}
-                                            className="p-2 rounded-lg text-espresso/30 hover:text-red-500 hover:bg-red-50 transition-all"
-                                            title="Hapus"
-                                        >
+                                            className="p-2 rounded-lg text-espresso/30 hover:text-red-500 hover:bg-red-50 transition-all" title="Hapus">
                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>

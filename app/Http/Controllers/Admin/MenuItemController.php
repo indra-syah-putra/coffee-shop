@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\MenuItem;
+use App\Models\MenuItemSize;
+use App\Models\MenuItemTopping;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -12,7 +14,7 @@ class MenuItemController extends Controller
     public function index()
     {
         return Inertia::render('Admin/MenuItems', [
-            'items' => MenuItem::orderBy('category')->orderBy('name')->get(),
+            'items' => MenuItem::with(['sizes', 'toppings'])->orderBy('category')->orderBy('name')->get(),
         ]);
     }
 
@@ -27,6 +29,8 @@ class MenuItemController extends Controller
             'active' => 'nullable|in:0,1,true,false',
             'image' => 'nullable|string',
             'description' => 'nullable|string',
+            'has_temperature' => 'nullable|in:0,1,true,false',
+            'has_sugar_level' => 'nullable|in:0,1,true,false',
         ]);
 
         $item = new MenuItem;
@@ -38,6 +42,8 @@ class MenuItemController extends Controller
         $item->active = filter_var($validated['active'] ?? true, FILTER_VALIDATE_BOOLEAN);
         $item->image = $validated['image'] ?? null;
         $item->description = $validated['description'] ?? null;
+        $item->has_temperature = filter_var($validated['has_temperature'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        $item->has_sugar_level = filter_var($validated['has_sugar_level'] ?? false, FILTER_VALIDATE_BOOLEAN);
         $item->save();
 
         return redirect()->back()->with('success', 'Menu item created.');
@@ -54,6 +60,8 @@ class MenuItemController extends Controller
             'image' => 'nullable|string',
             'description' => 'nullable|string',
             'active' => 'nullable|in:0,1,true,false',
+            'has_temperature' => 'nullable|in:0,1,true,false',
+            'has_sugar_level' => 'nullable|in:0,1,true,false',
         ]);
 
         $menuItem->name = $validated['name'];
@@ -64,6 +72,8 @@ class MenuItemController extends Controller
         $menuItem->active = filter_var($validated['active'] ?? true, FILTER_VALIDATE_BOOLEAN);
         $menuItem->image = $validated['image'] ?? null;
         $menuItem->description = $validated['description'] ?? null;
+        $menuItem->has_temperature = filter_var($validated['has_temperature'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        $menuItem->has_sugar_level = filter_var($validated['has_sugar_level'] ?? false, FILTER_VALIDATE_BOOLEAN);
         $menuItem->save();
 
         return redirect()->back()->with('success', 'Menu item updated.');
@@ -74,5 +84,67 @@ class MenuItemController extends Controller
         $menuItem->delete();
 
         return redirect()->back()->with('success', 'Menu item deleted.');
+    }
+
+    public function storeSize(Request $request, MenuItem $menuItem)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+        ]);
+
+        $menuItem->sizes()->create($validated);
+
+        return redirect()->back()->with('success', 'Size added.');
+    }
+
+    public function updateSize(Request $request, MenuItemSize $size)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+        ]);
+
+        $size->update($validated);
+
+        return redirect()->back()->with('success', 'Size updated.');
+    }
+
+    public function destroySize(MenuItemSize $size)
+    {
+        $size->delete();
+
+        return redirect()->back()->with('success', 'Size deleted.');
+    }
+
+    public function storeTopping(Request $request, MenuItem $menuItem)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+        ]);
+
+        $menuItem->toppings()->create($validated);
+
+        return redirect()->back()->with('success', 'Topping added.');
+    }
+
+    public function updateTopping(Request $request, MenuItemTopping $topping)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+        ]);
+
+        $topping->update($validated);
+
+        return redirect()->back()->with('success', 'Topping updated.');
+    }
+
+    public function destroyTopping(MenuItemTopping $topping)
+    {
+        $topping->delete();
+
+        return redirect()->back()->with('success', 'Topping deleted.');
     }
 }

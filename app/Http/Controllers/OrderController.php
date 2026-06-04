@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MenuItem;
 use App\Models\Order;
+use App\Models\Promo;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -15,31 +16,95 @@ class OrderController extends Controller
             'items' => 'required|array|min:1',
             'items.*.id' => 'required|exists:menu_items,id',
             'items.*.quantity' => 'required|integer|min:1',
+            'items.*.size' => 'nullable|string',
+            'items.*.temperature' => 'nullable|string',
+            'items.*.sugar_level' => 'nullable|string',
+            'items.*.toppings' => 'nullable|array',
+            'promo_id' => 'nullable|exists:promos,id',
         ]);
 
         $total = 0;
-        foreach ($validated['items'] as $item) {
-            $menuItem = MenuItem::findOrFail($item['id']);
-            $total += $menuItem->price * $item['quantity'];
+        $orderItems = [];
+
+        foreach ($validated['items'] as $itemData) {
+            $menuItem = MenuItem::with(['sizes', 'toppings'])->findOrFail($itemData['id']);
+            $price = (float) $menuItem->price;
+
+            if (!empty($itemData['size'])) {
+                $size = $menuItem->sizes->firstWhere('name', $itemData['size']);
+                if ($size) {
+                    $price = (float) $size->price;
+                }
+            }
+
+            $subtotal = $price * $itemData['quantity'];
+            $total += $subtotal;
+
+            $orderItems[] = [
+                'menu_item_id' => $menuItem->id,
+                'name' => $menuItem->name,
+                'price' => $price,
+                'quantity' => $itemData['quantity'],
+                'size' => $itemData['size'] ?? null,
+                'temperature' => $itemData['temperature'] ?? null,
+                'sugar_level' => $itemData['sugar_level'] ?? null,
+                'toppings' => !empty($itemData['toppings']) ? $itemData['toppings'] : null,
+            ];
+        }
+
+        $discount = 0;
+        $promoId = null;
+
+        if (!empty($validated['promo_id'])) {
+            $promo = Promo::active()->find($validated['promo_id']);
+            if ($promo) {
+                $promoId = $promo->id;
+                if ($promo->discount_type === 'percentage') {
+                    $discount = $total * ($promo->discount_value / 100);
+                } else {
+                    $discount = min((float) $promo->discount_value, $total);
+                }
+            }
         }
 
         $order = $request->user()->orders()->create([
-            'total' => $total,
+            'total' => $total - $discount,
             'status' => 'pending',
+            'promo_id' => $promoId,
+            'discount' => $discount,
         ]);
 
-        return redirect()->route('my-orders')->with('success', 'Pesanan berhasil! Total: Rp ' . number_format($total, 0, ',', '.'));
+        $order->items()->createMany($orderItems);
+
+        $msg = 'Pesanan berhasil! Total: Rp ' . number_format($total - $discount, 0, ',', '.');
+        if ($discount > 0) {
+            $msg .= ' (Diskon: Rp ' . number_format($discount, 0, ',', '.') . ')';
+        }
+
+        return redirect()->route('my-orders')->with('success', $msg);
     }
 
     public function myOrders(Request $request)
     {
         return Inertia::render('MyOrders/Index', [
-            'orders' => $request->user()->orders()->orderBy('created_at', 'desc')->get()->map(function ($order) {
+            'orders' => $request->user()->orders()->with('items')->orderBy('created_at', 'desc')->get()->map(function ($order) {
                 return [
                     'id' => $order->id,
                     'total' => $order->total,
+                    'discount' => $order->discount,
                     'status' => $order->status,
                     'created_at' => $order->created_at->format('d M Y H:i'),
+                    'items' => $order->items->map(function ($item) {
+                        return [
+                            'name' => $item->name,
+                            'price' => $item->price,
+                            'quantity' => $item->quantity,
+                            'size' => $item->size,
+                            'temperature' => $item->temperature,
+                            'sugar_level' => $item->sugar_level,
+                            'toppings' => $item->toppings,
+                        ];
+                    }),
                 ];
             }),
         ]);

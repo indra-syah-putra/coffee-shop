@@ -7,7 +7,10 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
 use App\Http\Controllers\Admin\MenuItemController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Admin\PromoController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Models\MenuItem;
+use App\Models\Promo;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -15,7 +18,8 @@ Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
-        'menuItems' => MenuItem::where('active', true)->orderBy('category')->orderBy('name')->get(),
+        'menuItems' => MenuItem::with(['sizes', 'toppings'])->where('active', true)->orderBy('category')->orderBy('name')->get(),
+        'promos' => Promo::active()->get(),
     ]);
 });
 
@@ -43,7 +47,9 @@ Route::middleware('auth')->group(function () {
 
     // Checkout
     Route::get('/checkout', function () {
-        return Inertia::render('Checkout/Index');
+        return Inertia::render('Checkout/Index', [
+            'promos' => Promo::active()->get(),
+        ]);
     })->name('checkout');
 
     // Orders
@@ -67,6 +73,26 @@ Route::middleware('admin')->prefix('dashboardadmin')->name('admin.')->group(func
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::put('/orders/{order}', [AdminOrderController::class, 'update'])->name('orders.update');
     Route::delete('/orders/{order}', [AdminOrderController::class, 'destroy'])->name('orders.destroy');
+
+    // Menu item sizes
+    Route::post('/menu-items/{menuItem}/sizes', [MenuItemController::class, 'storeSize'])->name('menu-items.sizes.store');
+    Route::put('/sizes/{size}', [MenuItemController::class, 'updateSize'])->name('sizes.update');
+    Route::delete('/sizes/{size}', [MenuItemController::class, 'destroySize'])->name('sizes.destroy');
+
+    // Menu item toppings
+    Route::post('/menu-items/{menuItem}/toppings', [MenuItemController::class, 'storeTopping'])->name('menu-items.toppings.store');
+    Route::put('/toppings/{topping}', [MenuItemController::class, 'updateTopping'])->name('toppings.update');
+    Route::delete('/toppings/{topping}', [MenuItemController::class, 'destroyTopping'])->name('toppings.destroy');
+
+    // Promos
+    Route::get('/promos', [PromoController::class, 'index'])->name('promos.index');
+    Route::post('/promos', [PromoController::class, 'store'])->name('promos.store');
+    Route::put('/promos/{promo}', [PromoController::class, 'update'])->name('promos.update');
+    Route::delete('/promos/{promo}', [PromoController::class, 'destroy'])->name('promos.destroy');
+
+    // Reports
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/export-csv', [ReportController::class, 'exportCsv'])->name('reports.export-csv');
 });
 
 require __DIR__.'/auth.php';

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\MenuItem;
 use App\Models\Order;
+use App\Models\Promo;
 use Inertia\Inertia;
 
 class AdminController extends Controller
@@ -17,6 +18,7 @@ class AdminController extends Controller
                 'totalMenuItems' => MenuItem::count(),
                 'totalBookings' => Booking::count(),
                 'totalOrders' => Order::count(),
+                'totalPromos' => Promo::count(),
             ],
         ]);
     }

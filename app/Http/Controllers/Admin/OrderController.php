@@ -12,14 +12,34 @@ class OrderController extends Controller
     public function index()
     {
         return Inertia::render('Admin/Orders', [
-            'orders' => Order::with('user')->orderBy('created_at', 'desc')->get(),
+            'orders' => Order::with(['user', 'items'])->orderBy('created_at', 'desc')->get()->map(function ($order) {
+                return [
+                    'id' => $order->id,
+                    'user' => $order->user,
+                    'total' => $order->total,
+                    'discount' => $order->discount,
+                    'status' => $order->status,
+                    'created_at' => $order->created_at->format('Y-m-d H:i:s'),
+                    'items' => $order->items->map(function ($item) {
+                        return [
+                            'name' => $item->name,
+                            'price' => $item->price,
+                            'quantity' => $item->quantity,
+                            'size' => $item->size,
+                            'temperature' => $item->temperature,
+                            'sugar_level' => $item->sugar_level,
+                            'toppings' => $item->toppings,
+                        ];
+                    }),
+                ];
+            }),
         ]);
     }
 
     public function update(Request $request, Order $order)
     {
         $validated = $request->validate([
-            'status' => 'required|in:pending,confirmed,processing,cancelled',
+            'status' => 'required|in:pending,confirmed,processing,completed,cancelled',
         ]);
 
         $order->update($validated);
