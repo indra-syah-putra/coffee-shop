@@ -28,6 +28,7 @@ class OrderController extends Controller
                             'size' => $item->size,
                             'temperature' => $item->temperature,
                             'sugar_level' => $item->sugar_level,
+                            'ice_level' => $item->ice_level,
                             'toppings' => $item->toppings,
                         ];
                     }),

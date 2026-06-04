@@ -19,6 +19,7 @@ class OrderController extends Controller
             'items.*.size' => 'nullable|string',
             'items.*.temperature' => 'nullable|string',
             'items.*.sugar_level' => 'nullable|string',
+            'items.*.ice_level' => 'nullable|string',
             'items.*.toppings' => 'nullable|array',
             'promo_id' => 'nullable|exists:promos,id',
         ]);
@@ -27,13 +28,20 @@ class OrderController extends Controller
         $orderItems = [];
 
         foreach ($validated['items'] as $itemData) {
-            $menuItem = MenuItem::with(['sizes', 'toppings'])->findOrFail($itemData['id']);
+            $menuItem = MenuItem::with(['optionValues', 'toppings'])->findOrFail($itemData['id']);
             $price = (float) $menuItem->price;
 
             if (!empty($itemData['size'])) {
-                $size = $menuItem->sizes->firstWhere('name', $itemData['size']);
-                if ($size) {
-                    $price = (float) $size->price;
+                $size = $menuItem->optionValues->firstWhere('name', $itemData['size']);
+                if ($size && $size->pivot->price > 0) {
+                    $price = (float) $size->pivot->price;
+                }
+            }
+
+            if (!empty($itemData['temperature'])) {
+                $temp = $menuItem->optionValues->firstWhere('name', $itemData['temperature']);
+                if ($temp && $temp->pivot->price > 0) {
+                    $price = (float) $temp->pivot->price;
                 }
             }
 
@@ -48,6 +56,7 @@ class OrderController extends Controller
                 'size' => $itemData['size'] ?? null,
                 'temperature' => $itemData['temperature'] ?? null,
                 'sugar_level' => $itemData['sugar_level'] ?? null,
+                'ice_level' => $itemData['ice_level'] ?? null,
                 'toppings' => !empty($itemData['toppings']) ? $itemData['toppings'] : null,
             ];
         }
@@ -102,6 +111,7 @@ class OrderController extends Controller
                             'size' => $item->size,
                             'temperature' => $item->temperature,
                             'sugar_level' => $item->sugar_level,
+                            'ice_level' => $item->ice_level,
                             'toppings' => $item->toppings,
                         ];
                     }),

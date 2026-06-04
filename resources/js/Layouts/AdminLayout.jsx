@@ -13,39 +13,39 @@ const navItems = [
     },
     {
         name: 'Kelola Menu',
-        route: 'admin.menu-items.index',
         icon: (
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" />
             </svg>
         ),
+        children: [
+            {
+                name: 'Menu',
+                route: 'admin.menu-items.index',
+            },
+            {
+                name: 'Kategori',
+                route: 'admin.categories.index',
+            },
+        ],
     },
     {
-        name: 'Reservasi',
-        route: 'admin.bookings.index',
-        icon: (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-        ),
-    },
-    {
-        name: 'Pesanan',
-        route: 'admin.orders.index',
+        name: 'Kelola Pemesanan',
         icon: (
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
             </svg>
         ),
-    },
-    {
-        name: 'Daily Specials',
-        route: 'admin.specials',
-        icon: (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-            </svg>
-        ),
+        children: [
+            {
+                name: 'Pesanan',
+                route: 'admin.orders.index',
+            },
+            {
+                name: 'Reservasi',
+                route: 'admin.bookings.index',
+            },
+        ],
     },
     {
         name: 'Promo',
@@ -65,25 +65,53 @@ const navItems = [
             </svg>
         ),
     },
+    {
+        name: 'Pengaturan',
+        route: 'admin.settings.index',
+        icon: (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+        ),
+    },
 ];
 
 export default function AdminLayout({ header, children }) {
     const { auth, flash, url } = usePage().props;
     const user = auth.user;
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [expandedMenus, setExpandedMenus] = useState(['Kelola Menu', 'Kelola Pemesanan']);
+
+    const toggleMenu = (name) => {
+        setExpandedMenus((prev) =>
+            prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]
+        );
+    };
 
     const isActive = (routeName) => {
-        // Ditambahkan fallback (url || '') untuk mencegah error 'undefined' sewaktu render awal
         const current = (url || '').split('/').filter(Boolean);
         
         if (routeName === 'admin.dashboard') return current.length === 1 && current[0] === 'dashboardadmin';
         if (routeName === 'admin.menu-items.index') return current.includes('menu-items');
+        if (routeName === 'admin.categories.index') return current.includes('categories');
         if (routeName === 'admin.bookings.index') return current.includes('bookings');
         if (routeName === 'admin.orders.index') return current.includes('orders');
-        if (routeName === 'admin.specials') return current.includes('specials');
         if (routeName === 'admin.promos.index') return current.includes('promos');
         if (routeName === 'admin.reports.index') return current.includes('reports');
+        if (routeName === 'admin.settings.index') return current.includes('settings');
         return false;
+    };
+
+    const isChildActive = (routes) => {
+        const current = (url || '').split('/').filter(Boolean);
+        return routes.some((r) => {
+            if (r === 'admin.menu-items.index') return current.includes('menu-items');
+            if (r === 'admin.categories.index') return current.includes('categories');
+            if (r === 'admin.orders.index') return current.includes('orders');
+            if (r === 'admin.bookings.index') return current.includes('bookings');
+            return false;
+        });
     };
 
     return (
@@ -112,6 +140,58 @@ export default function AdminLayout({ header, children }) {
                     {/* Navigation */}
                     <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
                         {navItems.map((item) => {
+                            if (item.children) {
+                                const expanded = expandedMenus.includes(item.name);
+                                const childActive = isChildActive(item.children.map((c) => c.route));
+                                return (
+                                    <div key={item.name}>
+                                        <button
+                                            onClick={() => toggleMenu(item.name)}
+                                            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                                                childActive
+                                                    ? 'bg-gold/20 text-gold font-semibold'
+                                                    : 'text-cream/60 hover:text-cream hover:bg-cream/5'
+                                            }`}
+                                        >
+                                            <span className={childActive ? 'text-gold' : 'text-cream/40'}>{item.icon}</span>
+                                            <span className="text-sm">{item.name}</span>
+                                            <svg
+                                                className={`w-4 h-4 ml-auto transition-transform duration-200 ${
+                                                    expanded ? 'rotate-90' : ''
+                                                } ${childActive ? 'text-gold' : 'text-cream/40'}`}
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </button>
+                                        {expanded && (
+                                            <div className="ml-4 mt-1 space-y-1 border-l border-gold/10 pl-3">
+                                                {item.children.map((child) => {
+                                                    const active = isActive(child.route);
+                                                    return (
+                                                        <Link
+                                                            key={child.route}
+                                                            href={route(child.route)}
+                                                            className={`flex items-center space-x-3 px-4 py-2.5 rounded-xl transition-all duration-200 ${
+                                                                active
+                                                                    ? 'bg-gold/15 text-gold font-semibold'
+                                                                    : 'text-cream/50 hover:text-cream hover:bg-cream/5'
+                                                            }`}
+                                                        >
+                                                            <span className={`w-1.5 h-1.5 rounded-full ${active ? 'bg-gold' : 'bg-cream/20'}`} />
+                                                            <span className="text-sm">{child.name}</span>
+                                                            {active && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-gold" />}
+                                                        </Link>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            }
+
                             const active = isActive(item.route);
                             return (
                                 <Link

@@ -4,7 +4,7 @@ import Hero from '@/Components/Coffee/Hero';
 import MenuSection from '@/Components/Coffee/MenuSection';
 import StorySection from '@/Components/Coffee/StorySection';
 import Footer from '@/Components/Coffee/Footer';
-export default function Welcome({ auth, menuItems }) {
+export default function Welcome({ auth, menuItems, settings }) {
     const { data: bookingData, setData: setBooking, post: postBooking, processing: bookingProcessing, errors: bookingErrors } = useForm({
         date: '', start_time: '10:00', end_time: '12:00', guests: 2, table_type: 'indoor', notes: '',
     });
@@ -55,7 +55,7 @@ export default function Welcome({ auth, menuItems }) {
                     )}
 
                     <MenuSection auth={auth} items={menuItems} />
-                    <StorySection />
+                    <StorySection settings={settings} />
 
                     {/* Reservation Section */}
                     <section id="reservation" className="section-spacing bg-white">

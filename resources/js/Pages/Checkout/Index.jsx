@@ -14,7 +14,7 @@ function getCheckoutItems() {
 }
 
 export default function Checkout({ auth, promos }) {
-    const { removeItem } = useCart();
+    const { removeItem, makeKey } = useCart();
     const [processing, setProcessing] = useState(false);
     const [items] = useState(getCheckoutItems);
     const [selectedPromo, setSelectedPromo] = useState('');
@@ -37,7 +37,8 @@ export default function Checkout({ auth, promos }) {
     const variantLabel = (item) => {
         const parts = [];
         if (item.size) parts.push(item.size);
-        if (item.temperature) parts.push(item.temperature === 'hot' ? 'Panas' : 'Dingin');
+        if (item.temperature) parts.push(item.temperature);
+        if (item.ice_level) parts.push(item.ice_level);
         if (item.sugar_level) parts.push('Gula ' + item.sugar_level);
         return parts.length > 0 ? parts.join(' · ') : null;
     };
@@ -55,12 +56,13 @@ export default function Checkout({ auth, promos }) {
                 size: i.size || null,
                 temperature: i.temperature || null,
                 sugar_level: i.sugar_level || null,
+                ice_level: i.ice_level || null,
                 toppings: i.toppings || null,
             })),
             promo_id: selectedPromo || null,
         }, {
             onSuccess: () => {
-                items.forEach(i => removeItem(i.id));
+                items.forEach(i => removeItem(makeKey(i)));
                 localStorage.removeItem('checkoutItems');
             },
             onFinish: () => setProcessing(false),
@@ -101,7 +103,7 @@ export default function Checkout({ auth, promos }) {
                                     <div key={idx} className="flex justify-between items-center py-2 border-b border-espresso/5 last:border-0">
                                         <div className="flex items-center space-x-3">
                                             {item.image && (
-                                                <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
+                                                <img src={item.image.startsWith('http') ? item.image : `/storage/${item.image}`} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
                                             )}
                                             <div>
                                                 <p className="font-semibold text-espresso">{item.name}</p>

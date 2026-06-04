@@ -42,7 +42,8 @@ export default function MyOrders({ auth, orders }) {
     const variantLabel = (item) => {
         const parts = [];
         if (item.size) parts.push(item.size);
-        if (item.temperature) parts.push(item.temperature === 'hot' ? 'Panas' : 'Dingin');
+        if (item.temperature) parts.push(item.temperature);
+        if (item.ice_level) parts.push(item.ice_level);
         if (item.sugar_level) parts.push('Gula ' + item.sugar_level);
         return parts.length > 0 ? parts.join(' · ') : null;
     };

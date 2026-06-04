@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\MenuItem;
-use App\Models\MenuItemSize;
 use App\Models\MenuItemTopping;
+use App\Models\MenuOptionValue;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class MenuItemController extends Controller
@@ -14,7 +16,11 @@ class MenuItemController extends Controller
     public function index()
     {
         return Inertia::render('Admin/MenuItems', [
-            'items' => MenuItem::with(['sizes', 'toppings'])->orderBy('category')->orderBy('name')->get(),
+            'items' => MenuItem::with(['category', 'optionValues', 'toppings'])->orderBy('name')->get(),
+            'categories' => Category::where('active', true)->orderBy('name')->get(),
+            'sizeOptions' => MenuOptionValue::where('type', 'size')->where('active', true)->orderBy('name')->get(),
+            'temperatureOptions' => MenuOptionValue::where('type', 'temperature')->where('active', true)->orderBy('name')->get(),
+            'sugarLevelOptions' => MenuOptionValue::where('type', 'sugar_level')->where('active', true)->orderBy('name')->get(),
         ]);
     }
 
@@ -23,28 +29,26 @@ class MenuItemController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
-            'category' => 'required|string',
-            'type' => 'nullable|string',
-            'caffeine' => 'nullable|in:0,1,true,false',
-            'active' => 'nullable|in:0,1,true,false',
-            'image' => 'nullable|string',
+            'category_id' => 'required|exists:categories,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'description' => 'nullable|string',
-            'has_temperature' => 'nullable|in:0,1,true,false',
-            'has_sugar_level' => 'nullable|in:0,1,true,false',
+            'option_values' => 'nullable|array',
+            'option_values.*' => 'exists:menu_option_values,id',
         ]);
 
         $item = new MenuItem;
         $item->name = $validated['name'];
         $item->price = $validated['price'];
-        $item->category = $validated['category'];
-        $item->type = $validated['type'] ?? null;
-        $item->caffeine = filter_var($validated['caffeine'] ?? false, FILTER_VALIDATE_BOOLEAN);
-        $item->active = filter_var($validated['active'] ?? true, FILTER_VALIDATE_BOOLEAN);
-        $item->image = $validated['image'] ?? null;
+        $item->category_id = $validated['category_id'];
         $item->description = $validated['description'] ?? null;
-        $item->has_temperature = filter_var($validated['has_temperature'] ?? false, FILTER_VALIDATE_BOOLEAN);
-        $item->has_sugar_level = filter_var($validated['has_sugar_level'] ?? false, FILTER_VALIDATE_BOOLEAN);
+
+        if ($request->hasFile('image')) {
+            $item->image = $request->file('image')->store('menus', 'public');
+        }
+
         $item->save();
+
+        $this->syncOptionValues($item, $request);
 
         return redirect()->back()->with('success', 'Menu item created.');
     }
@@ -54,67 +58,43 @@ class MenuItemController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
-            'category' => 'required|string',
-            'type' => 'nullable|string',
-            'caffeine' => 'nullable|in:0,1,true,false',
-            'image' => 'nullable|string',
+            'category_id' => 'required|exists:categories,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'description' => 'nullable|string',
-            'active' => 'nullable|in:0,1,true,false',
-            'has_temperature' => 'nullable|in:0,1,true,false',
-            'has_sugar_level' => 'nullable|in:0,1,true,false',
+            'option_values' => 'nullable|array',
+            'option_values.*' => 'exists:menu_option_values,id',
         ]);
 
         $menuItem->name = $validated['name'];
         $menuItem->price = $validated['price'];
-        $menuItem->category = $validated['category'];
-        $menuItem->type = $validated['type'] ?? null;
-        $menuItem->caffeine = filter_var($validated['caffeine'] ?? false, FILTER_VALIDATE_BOOLEAN);
-        $menuItem->active = filter_var($validated['active'] ?? true, FILTER_VALIDATE_BOOLEAN);
-        $menuItem->image = $validated['image'] ?? null;
+        $menuItem->category_id = $validated['category_id'];
         $menuItem->description = $validated['description'] ?? null;
-        $menuItem->has_temperature = filter_var($validated['has_temperature'] ?? false, FILTER_VALIDATE_BOOLEAN);
-        $menuItem->has_sugar_level = filter_var($validated['has_sugar_level'] ?? false, FILTER_VALIDATE_BOOLEAN);
+
+        if ($request->hasFile('image')) {
+            if ($menuItem->image) {
+                Storage::disk('public')->delete($menuItem->image);
+            }
+            $menuItem->image = $request->file('image')->store('menus', 'public');
+        }
+
         $menuItem->save();
+
+        if (isset($validated['option_values'])) {
+            $this->syncOptionValues($menuItem, $request);
+        }
 
         return redirect()->back()->with('success', 'Menu item updated.');
     }
 
     public function destroy(MenuItem $menuItem)
     {
+        if ($menuItem->image) {
+            Storage::disk('public')->delete($menuItem->image);
+        }
+        $menuItem->optionValues()->detach();
         $menuItem->delete();
 
         return redirect()->back()->with('success', 'Menu item deleted.');
-    }
-
-    public function storeSize(Request $request, MenuItem $menuItem)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-        ]);
-
-        $menuItem->sizes()->create($validated);
-
-        return redirect()->back()->with('success', 'Size added.');
-    }
-
-    public function updateSize(Request $request, MenuItemSize $size)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-        ]);
-
-        $size->update($validated);
-
-        return redirect()->back()->with('success', 'Size updated.');
-    }
-
-    public function destroySize(MenuItemSize $size)
-    {
-        $size->delete();
-
-        return redirect()->back()->with('success', 'Size deleted.');
     }
 
     public function storeTopping(Request $request, MenuItem $menuItem)
@@ -146,5 +126,31 @@ class MenuItemController extends Controller
         $topping->delete();
 
         return redirect()->back()->with('success', 'Topping deleted.');
+    }
+
+    protected function syncOptionValues($item, $request)
+    {
+        $optionValues = $request->input('option_values', []);
+        $optionPrices = $request->input('option_prices', []);
+
+        $syncData = [];
+        foreach ($optionValues as $ovId) {
+            $syncData[$ovId] = isset($optionPrices[$ovId]) && $optionPrices[$ovId] !== ''
+                ? ['price' => $optionPrices[$ovId]]
+                : [];
+        }
+
+        // Auto-attach ice_level options when Dingin temperature is selected
+        $dinginId = MenuOptionValue::where('type', 'temperature')->where('name', 'Dingin')->value('id');
+        if ($dinginId && in_array($dinginId, $optionValues)) {
+            $iceLevels = MenuOptionValue::where('type', 'ice_level')->pluck('id')->toArray();
+            foreach ($iceLevels as $ilId) {
+                if (!isset($syncData[$ilId])) {
+                    $syncData[$ilId] = [];
+                }
+            }
+        }
+
+        $item->optionValues()->sync($syncData);
     }
 }

@@ -6,22 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class MenuItem extends Model
 {
-    protected $fillable = ['name', 'price', 'category', 'type', 'caffeine', 'image', 'description', 'active', 'has_temperature', 'has_sugar_level'];
+    protected $fillable = ['name', 'price', 'category_id', 'image', 'description'];
 
-    protected function casts(): array
+    public function category()
     {
-        return [
-            'price' => 'decimal:2',
-            'caffeine' => 'boolean',
-            'active' => 'boolean',
-            'has_temperature' => 'boolean',
-            'has_sugar_level' => 'boolean',
-        ];
+        return $this->belongsTo(Category::class);
     }
 
-    public function sizes()
+    public function optionValues()
     {
-        return $this->hasMany(MenuItemSize::class);
+        return $this->belongsToMany(MenuOptionValue::class, 'menu_item_option')
+            ->withPivot('price')
+            ->withTimestamps();
     }
 
     public function toppings()

@@ -22,7 +22,8 @@ export default function Cart({ auth }) {
     const variantLabel = (item) => {
         const parts = [];
         if (item.size) parts.push(item.size);
-        if (item.temperature) parts.push(item.temperature === 'hot' ? 'Panas' : 'Dingin');
+        if (item.temperature) parts.push(item.temperature);
+        if (item.ice_level) parts.push(item.ice_level);
         if (item.sugar_level) parts.push('Gula ' + item.sugar_level);
         return parts.length > 0 ? parts.join(' · ') : null;
     };
@@ -70,7 +71,7 @@ export default function Cart({ auth }) {
                                                 <input type="checkbox" checked={selected.includes(key)} onChange={() => toggleItem(key)}
                                                     className="w-5 h-5 rounded border-2 border-espresso/30 checked:bg-gold checked:border-gold focus:ring-gold shrink-0 cursor-pointer" />
                                                 {item.image && (
-                                                    <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-xl shrink-0" />
+                                                    <img src={item.image.startsWith('http') ? item.image : `/storage/${item.image}`} alt={item.name} className="w-16 h-16 object-cover rounded-xl shrink-0" />
                                                 )}
                                                 <div className="flex-1 min-w-0">
                                                     <h3 className="font-bold text-espresso truncate">{item.name}</h3>

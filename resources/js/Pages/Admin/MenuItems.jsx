@@ -6,109 +6,151 @@ const inputClass = "w-full bg-cream-dark border border-gold/10 rounded-xl p-3 fo
 const labelClass = "text-xs font-bold text-espresso/40 uppercase tracking-widest mb-1.5 block";
 const errorClass = "text-red-500 text-xs mt-1.5 flex items-center space-x-1";
 
-export default function MenuItems({ items }) {
+const formatPrice = (value) => {
+    if (!value && value !== 0) return '';
+    const num = String(value).replace(/\./g, '');
+    return Number(num).toLocaleString('id-ID');
+};
+
+const parsePrice = (formatted) => {
+    return String(formatted).replace(/\./g, '');
+};
+
+const chipClass = (selected) =>
+    `px-3 py-1.5 text-xs rounded-lg border transition-all cursor-pointer ${
+        selected
+            ? 'bg-espresso text-white border-espresso shadow-sm'
+            : 'border-gold/20 text-espresso/60 hover:border-gold hover:text-espresso'
+    }`;
+
+const groupLabelClass = "text-[10px] font-bold text-espresso/40 uppercase tracking-widest block mb-2";
+
+const priceInputClass = "w-28 bg-cream-dark border border-gold/10 rounded-lg p-1.5 text-xs focus:ring-2 focus:ring-gold focus:border-gold text-espresso text-center";
+
+export default function MenuItems({ items, categories, sizeOptions, temperatureOptions, sugarLevelOptions }) {
     const { errors } = usePage().props;
     const [editing, setEditing] = useState(null);
-    const [showSizes, setShowSizes] = useState(null);
-    const [showToppings, setShowToppings] = useState(null);
+    const [preview, setPreview] = useState(null);
     const { data, setData, post, put, delete: destroy, processing } = useForm({
-        name: '', price: '', category: 'Signature Drinks', type: 'hot', caffeine: true,
-        image: '', description: '', active: true, has_temperature: false, has_sugar_level: false,
+        name: '', price: '', category_id: '',
+        image: '', description: '', option_values: [], option_prices: {},
     });
+
+    const toggleOption = (id) => {
+        const current = data.option_values || [];
+        const isSelected = current.includes(id);
+        const newOptionValues = isSelected
+            ? current.filter(v => v !== id)
+            : [...current, id];
+        const newPrices = { ...data.option_prices };
+        if (isSelected) {
+            delete newPrices[id];
+        }
+        setData({ ...data, option_values: newOptionValues, option_prices: newPrices });
+    };
+
+    const setOptionPrice = (id, value) => {
+        setData('option_prices', { ...data.option_prices, [id]: value });
+    };
 
     const resetForm = () => {
         setData({
-            name: '', price: '', category: 'Signature Drinks', type: 'hot', caffeine: true,
-            image: '', description: '', active: true, has_temperature: false, has_sugar_level: false,
+            name: '', price: '', category_id: '',
+            image: '', description: '', option_values: [], option_prices: {},
         });
+        setPreview(null);
         setEditing(null);
     };
 
     const submit = (e) => {
         e.preventDefault();
+        const prices = {};
+        for (const [id, val] of Object.entries(data.option_prices || {})) {
+            prices[id] = parsePrice(val);
+        }
+        const payload = {
+            ...data,
+            price: parsePrice(data.price),
+            option_prices: prices,
+        };
         if (editing) {
-            put(route('admin.menu-items.update', editing), { onSuccess: () => resetForm() });
+            put(route('admin.menu-items.update', editing), {
+                data: payload,
+                onSuccess: () => resetForm(),
+                preserveScroll: true,
+            });
         } else {
-            post(route('admin.menu-items.store'), { onSuccess: () => resetForm() });
+            post(route('admin.menu-items.store'), {
+                data: payload,
+                onSuccess: () => resetForm(),
+                preserveScroll: true,
+            });
+        }
+    };
+
+    const handleImage = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setData('image', file);
+            setPreview(URL.createObjectURL(file));
         }
     };
 
     const editItem = (item) => {
+        const prices = {};
+        (item.option_values || []).forEach(ov => {
+            if (ov.pivot?.price) {
+                prices[ov.id] = String(ov.pivot.price);
+            }
+        });
         setEditing(item.id);
         setData({
             name: item.name,
             price: String(item.price),
-            category: item.category,
-            type: item.type ?? 'hot',
-            caffeine: item.caffeine ?? true,
-            active: item.active ?? true,
+            category_id: item.category_id ?? '',
             image: item.image ?? '',
             description: item.description ?? '',
-            has_temperature: item.has_temperature ?? false,
-            has_sugar_level: item.has_sugar_level ?? false,
+            option_values: (item.option_values || []).map(ov => ov.id),
+            option_prices: prices,
         });
+        setPreview(item.image ? `/storage/${item.image}` : null);
     };
 
-    const SizeManager = ({ item }) => {
-        const { data: sizeData, setData: setSize, post: postSize, processing: sizeProcessing } = useForm({ name: '', price: '' });
-        const [editSizeId, setEditSizeId] = useState(null);
-        const sizes = item.sizes || [];
-
-        const submitSize = (e) => {
-            e.preventDefault();
-            postSize(route('admin.menu-items.sizes.store', item.id), {
-                onSuccess: () => { setSize({ name: '', price: '' }); },
-            });
-        };
-
-        return (
-            <div className="mt-4 p-4 bg-cream-dark rounded-xl">
-                <h5 className="text-sm font-bold text-espresso mb-3">Ukuran (Size)</h5>
-                <form onSubmit={submitSize} className="flex space-x-2 mb-3">
-                    <input value={sizeData.name} onChange={e => setSize('name', e.target.value)} placeholder="Small" className="flex-1 bg-white border border-gold/10 rounded-lg p-2 text-sm" />
-                    <input type="number" step="0.01" value={sizeData.price} onChange={e => setSize('price', e.target.value)} placeholder="Harga" className="w-24 bg-white border border-gold/10 rounded-lg p-2 text-sm" />
-                    <button type="submit" disabled={sizeProcessing} className="px-3 py-2 bg-gold text-espresso font-bold rounded-lg text-sm">Tambah</button>
-                </form>
-                <div className="space-y-1">
-                    {sizes.map(s => (
-                        <div key={s.id} className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-gold/5">
-                            <span className="text-sm text-espresso font-medium">{s.name} — <span className="text-gold">Rp {Number(s.price).toLocaleString('id-ID')}</span></span>
-                            <button onClick={() => { if (confirm('Hapus ukuran ini?')) router.delete(route('admin.sizes.destroy', s.id), { preserveScroll: true }); }}
-                                className="text-red-400 hover:text-red-600 text-xs">Hapus</button>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        );
+    const optionLabel = (type) => {
+        const map = { size: 'Ukuran', temperature: 'Suhu', sugar_level: 'Level Gula' };
+        return map[type] || type;
     };
 
-    const ToppingManager = ({ item }) => {
-        const { data: topData, setData: setTop, post: postTop, processing: topProcessing } = useForm({ name: '', price: '' });
-        const toppings = item.toppings || [];
+    const hasPrice = (type) => type === 'size' || type === 'temperature';
 
-        const submitTopping = (e) => {
-            e.preventDefault();
-            postTop(route('admin.menu-items.toppings.store', item.id), {
-                onSuccess: () => { setTop({ name: '', price: '' }); },
-            });
-        };
-
+    const renderOptionGroup = (options, type) => {
+        if (!options.length) return null;
         return (
-            <div className="mt-4 p-4 bg-cream-dark rounded-xl">
-                <h5 className="text-sm font-bold text-espresso mb-3">Topping</h5>
-                <form onSubmit={submitTopping} className="flex space-x-2 mb-3">
-                    <input value={topData.name} onChange={e => setTop('name', e.target.value)} placeholder="Nama topping" className="flex-1 bg-white border border-gold/10 rounded-lg p-2 text-sm" />
-                    <input type="number" step="0.01" value={topData.price} onChange={e => setTop('price', e.target.value)} placeholder="Harga" className="w-24 bg-white border border-gold/10 rounded-lg p-2 text-sm" />
-                    <button type="submit" disabled={topProcessing} className="px-3 py-2 bg-gold text-espresso font-bold rounded-lg text-sm">Tambah</button>
-                </form>
-                <div className="space-y-1">
-                    {toppings.map(t => (
-                        <div key={t.id} className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-gold/5">
-                            <span className="text-sm text-espresso font-medium">{t.name} — <span className="text-gold">Rp {Number(t.price).toLocaleString('id-ID')}</span></span>
-                            <button onClick={() => { if (confirm('Hapus topping ini?')) router.delete(route('admin.toppings.destroy', t.id), { preserveScroll: true }); }}
-                                className="text-red-400 hover:text-red-600 text-xs">Hapus</button>
-                        </div>
-                    ))}
+            <div>
+                <span className={groupLabelClass}>{optionLabel(type)}</span>
+                <div className="flex gap-1.5 flex-wrap">
+                    {options.map(opt => {
+                        const selected = (data.option_values || []).includes(opt.id);
+                        return (
+                            <div key={opt.id} className="flex flex-col gap-1">
+                                <div onClick={() => toggleOption(opt.id)}
+                                    className={chipClass(selected)}>
+                                    {opt.name}
+                                </div>
+                                {selected && hasPrice(type) && (
+                                    <input
+                                        type="text"
+                                        inputMode="numeric"
+                                        value={formatPrice(data.option_prices?.[opt.id])}
+                                        onChange={e => setOptionPrice(opt.id, parsePrice(e.target.value))}
+                                        placeholder="Harga"
+                                        className={priceInputClass}
+                                        onClick={e => e.stopPropagation()}
+                                    />
+                                )}
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
         );
@@ -144,33 +186,26 @@ export default function MenuItems({ items }) {
                                 {errors.name && <p className={errorClass}><span>⚠</span><span>{errors.name}</span></p>}
                             </div>
                             <div>
-                                <label className={labelClass}>Harga</label>
-                                <input type="number" step="0.01" value={data.price} onChange={e => setData('price', e.target.value)} placeholder="0" className={inputClass} />
+                                <label className={labelClass}>Harga (Rp)</label>
+                                <input type="text" inputMode="numeric" value={formatPrice(data.price)} onChange={e => setData('price', parsePrice(e.target.value))} placeholder="0" className={inputClass} />
                                 {errors.price && <p className={errorClass}><span>⚠</span><span>{errors.price}</span></p>}
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className={labelClass}>Kategori</label>
-                                    <select value={data.category} onChange={e => setData('category', e.target.value)} className={inputClass}>
-                                        <option value="Signature Drinks">Signature Drinks</option>
-                                        <option value="Pastries">Pastries</option>
-                                        <option value="Beans">Beans</option>
-                                    </select>
-                                    {errors.category && <p className={errorClass}><span>⚠</span><span>{errors.category}</span></p>}
-                                </div>
-                                <div>
-                                    <label className={labelClass}>Tipe</label>
-                                    <select value={data.type} onChange={e => setData('type', e.target.value)} className={inputClass}>
-                                        <option value="hot">Panas</option>
-                                        <option value="cold">Dingin</option>
-                                        <option value="">Tidak Ada</option>
-                                    </select>
-                                    {errors.type && <p className={errorClass}><span>⚠</span><span>{errors.type}</span></p>}
-                                </div>
+                            <div>
+                                <label className={labelClass}>Kategori</label>
+                                <select value={data.category_id} onChange={e => setData('category_id', e.target.value)} className={inputClass}>
+                                    <option value="">Pilih Kategori</option>
+                                    {categories.map(cat => (
+                                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                    ))}
+                                </select>
+                                {errors.category_id && <p className={errorClass}><span>⚠</span><span>{errors.category_id}</span></p>}
                             </div>
                             <div>
-                                <label className={labelClass}>Gambar (URL)</label>
-                                <input value={data.image} onChange={e => setData('image', e.target.value)} placeholder="https://..." className={inputClass} />
+                                <label className={labelClass}>Gambar</label>
+                                <input type="file" accept="image/*" onChange={handleImage} className={`${inputClass} file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-gold file:text-espresso file:font-bold file:text-sm hover:file:bg-gold-light`} />
+                                {preview && (
+                                    <img src={preview} alt="Preview" className="mt-2 w-32 h-32 object-cover rounded-xl border border-gold/10" />
+                                )}
                                 {errors.image && <p className={errorClass}><span>⚠</span><span>{errors.image}</span></p>}
                             </div>
                             <div>
@@ -178,28 +213,16 @@ export default function MenuItems({ items }) {
                                 <textarea value={data.description} onChange={e => setData('description', e.target.value)} placeholder="Deskripsi menu..." className={inputClass} rows="3" />
                                 {errors.description && <p className={errorClass}><span>⚠</span><span>{errors.description}</span></p>}
                             </div>
-                            <div className="flex items-center space-x-4 pt-2 pb-4 border-b border-gold/10 flex-wrap gap-y-2">
-                                <label className="flex items-center space-x-2.5 cursor-pointer group">
-                                    <input type="checkbox" checked={data.caffeine} onChange={e => setData('caffeine', e.target.checked)}
-                                        className="w-4 h-4 rounded border-gold/30 text-gold focus:ring-gold cursor-pointer" />
-                                    <span className="text-sm text-espresso/70 group-hover:text-espresso transition-colors">Berkafein</span>
-                                </label>
-                                <label className="flex items-center space-x-2.5 cursor-pointer group">
-                                    <input type="checkbox" checked={data.active} onChange={e => setData('active', e.target.checked)}
-                                        className="w-4 h-4 rounded border-gold/30 text-gold focus:ring-gold cursor-pointer" />
-                                    <span className="text-sm text-espresso/70 group-hover:text-espresso transition-colors">Aktif</span>
-                                </label>
-                                <label className="flex items-center space-x-2.5 cursor-pointer group">
-                                    <input type="checkbox" checked={data.has_temperature} onChange={e => setData('has_temperature', e.target.checked)}
-                                        className="w-4 h-4 rounded border-gold/30 text-gold focus:ring-gold cursor-pointer" />
-                                    <span className="text-sm text-espresso/70 group-hover:text-espresso transition-colors">Pilih Suhu</span>
-                                </label>
-                                <label className="flex items-center space-x-2.5 cursor-pointer group">
-                                    <input type="checkbox" checked={data.has_sugar_level} onChange={e => setData('has_sugar_level', e.target.checked)}
-                                        className="w-4 h-4 rounded border-gold/30 text-gold focus:ring-gold cursor-pointer" />
-                                    <span className="text-sm text-espresso/70 group-hover:text-espresso transition-colors">Pilih Gula</span>
-                                </label>
-                            </div>
+
+                            {/* Variasi Options */}
+                            {[sizeOptions, temperatureOptions, sugarLevelOptions].some(g => g.length > 0) && (
+                                <div className="pt-2 pb-2 border-t border-gold/10 space-y-4">
+                                    {renderOptionGroup(sizeOptions, 'size')}
+                                    {renderOptionGroup(temperatureOptions, 'temperature')}
+                                    {renderOptionGroup(sugarLevelOptions, 'sugar_level')}
+                                </div>
+                            )}
+
                             <div className="flex space-x-3 pt-2">
                                 <button type="submit" disabled={processing}
                                     className="flex-1 px-6 py-3 bg-gradient-to-r from-gold to-gold-light text-espresso font-bold rounded-xl hover:shadow-lg hover:shadow-gold/30 transition-all duration-300 disabled:opacity-50 text-sm">
@@ -248,41 +271,24 @@ export default function MenuItems({ items }) {
                                                 {String(index + 1).padStart(2, '0')}
                                             </div>
                                             <div>
-                                                <div className="flex items-center space-x-2.5">
-                                                    <h4 className="font-bold text-espresso">{item.name}</h4>
-                                                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                                                        item.active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'
-                                                    }`}>{item.active ? 'Aktif' : 'Nonaktif'}</span>
-                                                </div>
+                                                <h4 className="font-bold text-espresso">{item.name}</h4>
                                                 <div className="flex items-center space-x-3 mt-0.5">
                                                     <span className="text-gold font-bold text-sm">Rp {Number(item.price).toLocaleString('id-ID')}</span>
                                                     <span className="text-espresso/20">|</span>
-                                                    <span className="text-espresso/40 text-xs">{item.category}</span>
-                                                    {item.type && (<><span className="text-espresso/20">|</span><span className="text-espresso/40 text-xs capitalize">{item.type === 'hot' ? 'Panas' : 'Dingin'}</span></>)}
-                                                    {item.has_temperature && <span className="text-[10px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded">Suhu</span>}
-                                                    {item.has_sugar_level && <span className="text-[10px] bg-pink-100 text-pink-600 px-1.5 py-0.5 rounded">Gula</span>}
+                                                    <span className="text-espresso/40 text-xs">{item.category?.name || 'Tanpa Kategori'}</span>
                                                 </div>
-                                                {(item.sizes?.length > 0 || item.toppings?.length > 0) && (
-                                                    <div className="flex items-center gap-2 mt-1.5">
-                                                        {item.sizes?.length > 0 && <span className="text-[10px] text-espresso/40">{item.sizes.length} ukuran</span>}
-                                                        {item.toppings?.length > 0 && <span className="text-[10px] text-espresso/40">{item.toppings.length} topping</span>}
+                                                {item.option_values?.length > 0 && (
+                                                    <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                                                        {item.option_values.map(ov => (
+                                                            <span key={ov.id} className="text-[10px] bg-espresso/10 text-espresso/60 px-1.5 py-0.5 rounded">
+                                                                {ov.name}{ov.pivot?.price ? ` (Rp ${Number(ov.pivot.price).toLocaleString('id-ID')})` : ''}
+                                                            </span>
+                                                        ))}
                                                     </div>
                                                 )}
                                             </div>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <button onClick={() => setShowSizes(showSizes === item.id ? null : item.id)}
-                                                className="p-2 rounded-lg bg-blue-50 text-blue-500 hover:bg-blue-100 transition-colors" title="Sizes">
-                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                                                </svg>
-                                            </button>
-                                            <button onClick={() => setShowToppings(showToppings === item.id ? null : item.id)}
-                                                className="p-2 rounded-lg bg-pink-50 text-pink-500 hover:bg-pink-100 transition-colors" title="Toppings">
-                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                                                </svg>
-                                            </button>
                                             <button onClick={() => editItem(item)}
                                                 className="p-2 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors" title="Edit">
                                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -297,8 +303,6 @@ export default function MenuItems({ items }) {
                                             </button>
                                         </div>
                                     </div>
-                                    {showSizes === item.id && <SizeManager item={item} />}
-                                    {showToppings === item.id && <ToppingManager item={item} />}
                                 </div>
                             ))}
                             {items.length === 0 && (

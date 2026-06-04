@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 function makeKey(item) {
-    const vars = [item.id, item.size, item.temperature, item.sugar_level, item.toppings ? JSON.stringify([...item.toppings].sort()) : ''];
+    const vars = [item.id, item.size, item.temperature, item.sugar_level, item.ice_level, item.toppings ? JSON.stringify([...item.toppings].sort()) : ''];
     return vars.filter(Boolean).join('::');
 }
 
@@ -36,6 +36,7 @@ export function CartProvider({ children }) {
                 size: item.size || null,
                 temperature: item.temperature || null,
                 sugar_level: item.sugar_level || null,
+                ice_level: item.ice_level || null,
                 toppings: item.toppings || [],
                 quantity: 1,
             }];
