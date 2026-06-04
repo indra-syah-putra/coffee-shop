@@ -8,6 +8,17 @@
   A web-based coffee shop management system built with Laravel 11 + Inertia + React.
 </p>
 
+## Screenshots
+
+<p align="center">
+  <img src="public/images/hero.png" width="700" alt="Hero Section">
+</p>
+
+<p align="center">
+  <img src="public/images/latte.png" width="300" alt="Menu Item">
+  <img src="public/images/pastries.png" width="300" alt="Pastries">
+</p>
+
 ## Features
 
 - **Menu Management** — Browse coffee and non-coffee menus with categories, types, and caffeine info

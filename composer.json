@@ -1,8 +1,8 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "indra-syah-putra/coffee-shop",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Coffee shop management system built with Laravel 11, Inertia & React.",
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
