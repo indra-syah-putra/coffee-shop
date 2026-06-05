@@ -17,20 +17,20 @@ export default {
             },
             colors: {
                 espresso: {
-                    DEFAULT: '#3E2723',
-                    dark: '#261712',
+                    DEFAULT: '#2B1814',
+                    dark: '#1E110E',
                 },
                 cream: {
-                    DEFAULT: '#FFFFFF',
-                    dark: '#FFFAF5',
+                    DEFAULT: '#FFFDF9',
+                    dark: '#F9F5F0',
                 },
                 gold: {
                     DEFAULT: '#D4AF37',
-                    light: '#E6C75A',
+                    light: '#E3C55A',
                 },
                 'light-brown': {
-                    DEFAULT: '#8D6E63',
-                    light: '#A1887F',
+                    DEFAULT: '#3D251E',
+                    light: '#5A3A30',
                 },
             },
         },

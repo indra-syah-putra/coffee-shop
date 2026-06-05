@@ -9,6 +9,7 @@ import { useRef, useState } from 'react';
 export default function UpdateProfileInformation({
     mustVerifyEmail,
     status,
+    updateRoute,
 }) {
     const user = usePage().props.auth.user;
     const [preview, setPreview] = useState(null);
@@ -31,7 +32,7 @@ export default function UpdateProfileInformation({
 
     const submit = (e) => {
         e.preventDefault();
-        post(route('profile.update'), {
+        post(route(updateRoute || 'profile.update'), {
             forceFormData: true,
             preserveScroll: true,
             onSuccess: () => {

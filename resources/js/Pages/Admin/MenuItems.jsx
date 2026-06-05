@@ -160,10 +160,10 @@ export default function MenuItems({ items, categories, sizeOptions, temperatureO
         <AdminLayout header={<h2 className="font-semibold text-xl text-espresso leading-tight">Kelola Menu</h2>}>
             <Head title="Admin | Menu Items" />
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="min-h-0 flex-1 grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Form */}
-                <div className="lg:col-span-1">
-                    <div className="bg-white rounded-2xl border border-gold/10 p-6 shadow-sm">
+                <div className="lg:col-span-1 min-h-0">
+                    <div className="bg-white rounded-2xl border border-gold/10 p-6 shadow-sm lg:sticky lg:top-0 overflow-y-auto max-h-[calc(100vh-12rem)]">
                         <div className="flex items-center space-x-3 mb-6">
                             <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${editing ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-600'}`}>
                                 {editing ? (
@@ -248,8 +248,8 @@ export default function MenuItems({ items, categories, sizeOptions, temperatureO
                 </div>
 
                 {/* Menu List */}
-                <div className="lg:col-span-2">
-                    <div className="bg-white rounded-2xl border border-gold/10 p-6 shadow-sm">
+                <div className="lg:col-span-2 min-h-0">
+                    <div className="bg-white rounded-2xl border border-gold/10 p-6 shadow-sm overflow-y-auto max-h-[calc(100vh-12rem)]">
                         <div className="flex items-center justify-between mb-6">
                             <div className="flex items-center space-x-3">
                                 <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center">

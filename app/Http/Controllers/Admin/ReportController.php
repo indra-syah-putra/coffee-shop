@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -88,5 +89,44 @@ class ReportController extends Controller
 
         fclose($output);
         exit;
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $startDate = $request->get('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
+        $endDate = $request->get('end_date', Carbon::now()->format('Y-m-d'));
+
+        $orders = Order::with(['items', 'user'])
+            ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $totalRevenue = $orders->sum('total');
+        $totalOrders = $orders->count();
+        $totalDiscount = $orders->sum('discount');
+
+        $itemSales = OrderItem::whereHas('order', function ($q) use ($startDate, $endDate) {
+            $q->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
+        })->get()->groupBy('name')->map(function ($items) {
+            return [
+                'name' => $items->first()->name,
+                'quantity' => $items->sum('quantity'),
+                'revenue' => $items->sum(function ($i) { return $i->price * $i->quantity; }),
+            ];
+        })->sortByDesc('quantity')->values()->toArray();
+
+        $pdf = Pdf::loadView('reports.sales-pdf', [
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'stats' => [
+                'totalRevenue' => $totalRevenue,
+                'totalOrders' => $totalOrders,
+                'totalDiscount' => $totalDiscount,
+            ],
+            'itemSales' => $itemSales,
+        ]);
+
+        $filename = "laporan_penjualan_{$startDate}_to_{$endDate}.pdf";
+        return $pdf->download($filename);
     }
 }

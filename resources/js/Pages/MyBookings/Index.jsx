@@ -30,10 +30,8 @@ export default function MyBookings({ auth, bookings }) {
 
                 <main className="pt-32 pb-20">
                     <div className="max-w-4xl mx-auto px-6">
-                        <div className="flex items-center justify-between mb-10">
-                            <h1 className="text-3xl font-bold text-espresso">Riwayat Booking</h1>
-                            <Link href="/" className="text-espresso/60 hover:text-gold transition-colors text-sm font-medium">&larr; Kembali</Link>
-                        </div>
+                        <h1 className="text-3xl font-bold text-espresso mb-3">Riwayat Booking</h1>
+                        <Link href="/" className="inline-flex items-center text-espresso/60 hover:text-gold transition-colors text-sm font-medium mb-8">&larr; Kembali</Link>
 
                         {bookings.length === 0 ? (
                             <div className="text-center py-20">

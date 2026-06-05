@@ -19,10 +19,8 @@ export default function Edit({ mustVerifyEmail, status }) {
 
                 <main className="pt-32 pb-20">
                     <div className="max-w-4xl mx-auto px-6">
-                        <div className="flex items-center justify-between mb-10">
-                            <h1 className="text-3xl font-bold text-espresso">Profil Saya</h1>
-                            <Link href="/" className="text-espresso/60 hover:text-gold transition-colors text-sm font-medium">&larr; Kembali</Link>
-                        </div>
+                        <h1 className="text-3xl font-bold text-espresso mb-3">Profil Saya</h1>
+                        <Link href="/" className="inline-flex items-center text-espresso/60 hover:text-gold transition-colors text-sm font-medium mb-8">&larr; Kembali</Link>
 
                         <div className="bg-espresso rounded-2xl p-8 flex items-center gap-6 mb-8">
                             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gold text-2xl font-bold text-espresso shrink-0 overflow-hidden">

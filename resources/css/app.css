@@ -5,14 +5,14 @@
 @tailwind utilities;
 
 :root {
-    --espresso: #3E2723;
-    --espresso-dark: #261712;
-    --cream: #FFFFFF;
-    --cream-dark: #FFFAF5;
+    --espresso: #2B1814;
+    --espresso-dark: #1E110E;
+    --cream: #FFFDF9;
+    --cream-dark: #F9F5F0;
     --gold: #D4AF37;
-    --gold-light: #E6C75A;
-    --light-brown: #8D6E63;
-    --light-brown-light: #A1887F;
+    --gold-light: #E3C55A;
+    --light-brown: #3D251E;
+    --light-brown-light: #5A3A30;
 }
 
 body {
@@ -27,7 +27,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .glass-nav {
-    background: rgba(62, 39, 35, 0.92);
+    background: rgba(43, 24, 20, 0.92);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(212, 175, 55, 0.25);
 }
@@ -97,7 +97,7 @@ h1, h2, h3, h4, h5, h6 {
 .btn-premium:hover {
     background-color: var(--gold-light);
     transform: translateY(-2px);
-    box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+    box-shadow: 0 4px 20px rgba(212, 175, 55, 0.35);
 }
 
 .card-premium {
@@ -108,7 +108,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .card-premium:hover {
     transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(62, 39, 35, 0.12);
+    box-shadow: 0 20px 40px rgba(43, 24, 20, 0.12);
 }
 
 .section-spacing {
@@ -125,10 +125,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--light-brown);
+    background: var(--light-brown-light);
     border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
     background: var(--espresso);
+}
+
+::-webkit-scrollbar-track {
+    background: var(--cream-dark);
 }

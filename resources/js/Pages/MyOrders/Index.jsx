@@ -61,10 +61,8 @@ export default function MyOrders({ auth, orders }) {
                             </div>
                         )}
 
-                        <div className="flex items-center justify-between mb-10">
-                            <h1 className="text-3xl font-bold text-espresso">Riwayat Pemesanan</h1>
-                            <Link href="/" className="text-espresso/60 hover:text-gold transition-colors text-sm font-medium">&larr; Kembali</Link>
-                        </div>
+                        <h1 className="text-3xl font-bold text-espresso mb-3">Riwayat Pemesanan</h1>
+                        <Link href="/" className="inline-flex items-center text-espresso/60 hover:text-gold transition-colors text-sm font-medium mb-8">&larr; Kembali</Link>
 
                         {orders.length === 0 ? (
                             <div className="text-center py-20">

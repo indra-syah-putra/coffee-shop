@@ -42,9 +42,9 @@ export default function Categories({ categories }) {
         }>
             <Head title="Admin | Categories" />
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-1">
-                    <div className="bg-white rounded-2xl border border-gold/10 p-6 shadow-sm">
+            <div className="min-h-0 flex-1 grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-1 min-h-0">
+                    <div className="bg-white rounded-2xl border border-gold/10 p-6 shadow-sm lg:sticky lg:top-0 overflow-y-auto max-h-[calc(100vh-12rem)]">
                         <h3 className="text-lg font-bold text-espresso mb-6">{editing ? 'Edit Kategori' : 'Tambah Kategori'}</h3>
                         <form onSubmit={submit} className="space-y-4">
                             <div>
@@ -71,8 +71,8 @@ export default function Categories({ categories }) {
                     </div>
                 </div>
 
-                <div className="lg:col-span-2">
-                    <div className="bg-white rounded-2xl border border-gold/10 p-6 shadow-sm">
+                <div className="lg:col-span-2 min-h-0">
+                    <div className="bg-white rounded-2xl border border-gold/10 p-6 shadow-sm overflow-y-auto max-h-[calc(100vh-12rem)]">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-lg font-bold text-espresso">Daftar Kategori</h3>
                             <a href={route('admin.menu-items.index')} className="text-xs text-gold hover:text-espresso font-semibold transition-colors">← Kembali ke Menu</a>

@@ -115,10 +115,10 @@ export default function AdminLayout({ header, children }) {
     };
 
     return (
-        <div className="min-h-screen bg-cream-dark flex">
+        <div className="min-h-screen bg-cream-dark flex overflow-hidden">
             {/* Sidebar */}
-            <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-espresso transform transition-transform duration-300 lg:translate-x-0 lg:static lg:inset-auto ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-                <div className="flex flex-col h-full">
+            <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-espresso transform transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                <div className="flex flex-col h-screen">
                     {/* Brand */}
                     <div className="flex items-center justify-between px-6 py-6 border-b border-gold/10">
                         <Link href="/dashboardadmin" className="flex items-center space-x-3">
@@ -219,16 +219,10 @@ export default function AdminLayout({ header, children }) {
                             </div>
                             <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium text-cream truncate">{user?.name}</p>
-                                <Link href={route('profile.edit')} className="text-xs text-cream/40 hover:text-gold transition-colors">Profil</Link>
+                                <Link href={route('admin.profile')} className="text-xs text-cream/40 hover:text-gold transition-colors">Profil</Link>
                             </div>
                         </div>
                         <div className="mt-2 px-4">
-                            <Link href="/" className="flex items-center space-x-2 px-4 py-2 rounded-lg text-cream/40 hover:text-cream hover:bg-cream/5 transition-all text-xs">
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                                </svg>
-                                <span>Kembali ke Website</span>
-                            </Link>
                             <Link href={route('logout')} method="post" as="button" className="flex items-center space-x-2 w-full px-4 py-2 rounded-lg text-cream/40 hover:text-red-400 hover:bg-red-500/5 transition-all text-xs">
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -246,9 +240,9 @@ export default function AdminLayout({ header, children }) {
             )}
 
             {/* Main Content */}
-            <div className="flex-1 flex flex-col min-h-screen">
+            <div className="flex-1 flex flex-col h-screen lg:ml-64">
                 {/* Top Bar */}
-                <header className="bg-white shadow-sm border-b border-gold/10 sticky top-0 z-30">
+                <header className="bg-white shadow-sm border-b border-gold/10 z-30">
                     <div className="flex items-center justify-between px-6 py-4">
                         <div className="flex items-center space-x-4">
                             <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-espresso/60 hover:text-espresso">
@@ -263,7 +257,7 @@ export default function AdminLayout({ header, children }) {
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                                 </svg>
-                                <span>Website</span>
+                                <span>Lihat Website</span>
                             </Link>
                             <div className="h-6 w-px bg-gold/10 hidden sm:block" />
                             <Link href={route('logout')} method="post" as="button" className="flex items-center space-x-2 px-4 py-2 rounded-lg text-espresso/50 hover:text-red-500 hover:bg-red-50 transition-all text-sm">
@@ -287,7 +281,7 @@ export default function AdminLayout({ header, children }) {
                 )}
 
                 {/* Page Content */}
-                <main className="flex-1 p-6">
+                <main className="flex-1 min-h-0 p-6 overflow-y-auto">
                     {children}
                 </main>
 

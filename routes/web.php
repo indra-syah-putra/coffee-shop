@@ -17,6 +17,18 @@ use App\Models\Setting;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+Route::get('/privacy', function () {
+    return Inertia::render('Privacy', [
+        'content' => Setting::where('key', 'privacy_policy')->value('value'),
+    ]);
+})->name('privacy');
+
+Route::get('/terms', function () {
+    return Inertia::render('Terms', [
+        'content' => Setting::where('key', 'terms_conditions')->value('value'),
+    ]);
+})->name('terms');
+
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -64,6 +76,8 @@ Route::middleware('auth')->group(function () {
 // Admin dashboard
 Route::middleware('admin')->prefix('dashboardadmin')->name('admin.')->group(function () {
     Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/profile', [AdminController::class, 'profile'])->name('profile');
+    Route::patch('/profile', [AdminController::class, 'updateProfile'])->name('profile.update');
     Route::get('/menu-items', [MenuItemController::class, 'index'])->name('menu-items.index');
     Route::post('/menu-items', [MenuItemController::class, 'store'])->name('menu-items.store');
     Route::put('/menu-items/{menuItem}', [MenuItemController::class, 'update'])->name('menu-items.update');
@@ -95,6 +109,7 @@ Route::middleware('admin')->prefix('dashboardadmin')->name('admin.')->group(func
     // Reports
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/export-csv', [ReportController::class, 'exportCsv'])->name('reports.export-csv');
+    Route::get('/reports/export-pdf', [ReportController::class, 'exportPdf'])->name('reports.export-pdf');
 
     // Settings
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
