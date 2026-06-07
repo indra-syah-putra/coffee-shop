@@ -1,6 +1,7 @@
-<p align="center">
-<img src="[https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg](https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg)" width="400" alt="Laravel Logo">
+<<p align="center">
+  <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo">
 </p>
+
 <h1 align="center">☕ Coffee Shop</h1>
 <p align="center">
 Aplikasi manajemen kedai kopi berbasis web yang dibuat menggunakan Laravel 11, Inertia, dan React.
@@ -94,9 +95,6 @@ Halaman admin dapat diakses melalui URL:
 └── config/                  # File konfigurasi global Laravel
 
 ```
-## Lisensi
-Project ini dirilis di bawah lisensi MIT.
-
 ## License
 
 [MIT](LICENSE)
