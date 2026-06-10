@@ -23,14 +23,22 @@ export default function AdminLogin({ status }) {
             <Head title="Admin | Masuk" />
 
             <div className="mb-6">
-                <span className="text-3xl font-bold tracking-tighter text-espresso">KAFEIN</span>
-                <span className="block text-center text-xs text-espresso/40 mt-1 uppercase tracking-widest">Admin Panel</span>
+                <span className="text-3xl font-bold tracking-tighter text-espresso">
+                    KAFEIN
+                </span>
+                <span className="mt-1 block text-center text-xs uppercase tracking-widest text-espresso/40">
+                    Admin Panel
+                </span>
             </div>
 
-            <div className="w-full overflow-hidden bg-white px-8 py-10 shadow-2xl sm:max-w-md sm:rounded-2xl border border-gold/20">
+            <div className="w-full overflow-hidden border border-gold/20 bg-white px-8 py-10 shadow-2xl sm:max-w-md sm:rounded-2xl">
                 <div className="mb-8 text-center">
-                    <h2 className="text-2xl font-bold text-espresso">Masuk Admin</h2>
-                    <p className="text-espresso/60 text-sm">Akses panel administrasi</p>
+                    <h2 className="text-2xl font-bold text-espresso">
+                        Masuk Admin
+                    </h2>
+                    <p className="text-sm text-espresso/60">
+                        Akses panel administrasi
+                    </p>
                 </div>
 
                 {status && (
@@ -41,14 +49,18 @@ export default function AdminLogin({ status }) {
 
                 <form onSubmit={submit}>
                     <div>
-                        <InputLabel htmlFor="email" value="Email" className="text-espresso/70" />
+                        <InputLabel
+                            htmlFor="email"
+                            value="Email"
+                            className="text-espresso/70"
+                        />
 
                         <TextInput
                             id="email"
                             type="email"
                             name="email"
                             value={data.email}
-                            className="mt-1 block w-full bg-cream-dark border-light-brown/20 text-espresso"
+                            className="mt-1 block w-full border-light-brown/20 bg-cream-dark text-espresso"
                             autoComplete="username"
                             isFocused={true}
                             onChange={(e) => setData('email', e.target.value)}
@@ -58,23 +70,35 @@ export default function AdminLogin({ status }) {
                     </div>
 
                     <div className="mt-4">
-                        <InputLabel htmlFor="password" value="Kata Sandi" className="text-espresso/70" />
+                        <InputLabel
+                            htmlFor="password"
+                            value="Kata Sandi"
+                            className="text-espresso/70"
+                        />
 
                         <TextInput
                             id="password"
                             type="password"
                             name="password"
                             value={data.password}
-                            className="mt-1 block w-full bg-cream-dark border-light-brown/20 text-espresso"
+                            className="mt-1 block w-full border-light-brown/20 bg-cream-dark text-espresso"
                             autoComplete="current-password"
-                            onChange={(e) => setData('password', e.target.value)}
+                            onChange={(e) =>
+                                setData('password', e.target.value)
+                            }
                         />
 
-                        <InputError message={errors.password} className="mt-2" />
+                        <InputError
+                            message={errors.password}
+                            className="mt-2"
+                        />
                     </div>
 
                     <div className="mt-6">
-                        <PrimaryButton className="w-full justify-center" disabled={processing}>
+                        <PrimaryButton
+                            className="w-full justify-center"
+                            disabled={processing}
+                        >
                             Masuk
                         </PrimaryButton>
                     </div>

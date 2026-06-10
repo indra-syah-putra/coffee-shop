@@ -1,0 +1,1 @@
+<?php require 'vendor/autoload.php'; $app=require_once 'bootstrap/app.php'; $app->make('Illuminate\Contracts\Console\Kernel')->bootstrap(); $orders=App\Models\Order::select('id','order_number','status')->limit(5)->get()->toArray(); print_r($orders);

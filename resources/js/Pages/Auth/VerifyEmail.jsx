@@ -16,12 +16,16 @@ export default function VerifyEmail({ status }) {
             <Head title="Verifikasi Email" />
 
             <div className="mb-4 text-sm text-gray-600">
-                Terima kasih telah mendaftar! Sebelum memulai, verifikasi alamat email Anda dengan mengklik tautan yang kami kirimkan. Jika Anda tidak menerima email, kami akan dengan senang hati mengirimkan ulang.
+                Terima kasih telah mendaftar! Sebelum memulai, verifikasi alamat
+                email Anda dengan mengklik tautan yang kami kirimkan. Jika Anda
+                tidak menerima email, kami akan dengan senang hati mengirimkan
+                ulang.
             </div>
 
             {status === 'verification-link-sent' && (
                 <div className="mb-4 text-sm font-medium text-green-600">
-                    Tautan verifikasi baru telah dikirim ke alamat email yang Anda berikan saat pendaftaran.
+                    Tautan verifikasi baru telah dikirim ke alamat email yang
+                    Anda berikan saat pendaftaran.
                 </div>
             )}
 

@@ -1,6 +1,6 @@
-import { Head, Link, usePage } from '@inertiajs/react';
-import Navbar from '@/Components/Coffee/Navbar';
 import Footer from '@/Components/Coffee/Footer';
+import Navbar from '@/Components/Coffee/Navbar';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { useEffect } from 'react';
 
 export default function MyOrders({ auth, orders }) {
@@ -51,54 +51,139 @@ export default function MyOrders({ auth, orders }) {
     return (
         <>
             <Head title="Riwayat Pemesanan" />
-            <div className="bg-cream min-h-screen">
+            <div className="min-h-screen bg-cream">
                 <Navbar auth={auth} alwaysShow={true} />
-                <main className="pt-32 pb-20">
-                    <div className="max-w-4xl mx-auto px-6">
+                <main className="pb-20 pt-32">
+                    <div className="mx-auto max-w-4xl px-6">
                         {successMsg && (
-                            <div id="order-success-msg" className="bg-green-100 border border-green-300 text-green-800 rounded-xl p-4 mb-6 transition-opacity duration-1000 text-sm font-semibold">
+                            <div
+                                id="order-success-msg"
+                                className="mb-6 rounded-xl border border-green-300 bg-green-100 p-4 text-sm font-semibold text-green-800 transition-opacity duration-1000"
+                            >
                                 {successMsg}
                             </div>
                         )}
 
-                        <h1 className="text-3xl font-bold text-espresso mb-3">Riwayat Pemesanan</h1>
-                        <Link href="/" className="inline-flex items-center text-espresso/60 hover:text-gold transition-colors text-sm font-medium mb-8">&larr; Kembali</Link>
+                        <h1 className="mb-3 text-3xl font-bold text-espresso">
+                            Riwayat Pemesanan
+                        </h1>
+                        <Link
+                            href="/"
+                            className="mb-8 inline-flex items-center text-sm font-medium text-espresso/60 transition-colors hover:text-gold"
+                        >
+                            &larr; Kembali
+                        </Link>
 
                         {orders.length === 0 ? (
-                            <div className="text-center py-20">
-                                <p className="text-espresso/40 italic mb-6">Anda belum memiliki pesanan.</p>
-                                <Link href="/#menu" className="btn-premium">Pesan Sekarang</Link>
+                            <div className="py-20 text-center">
+                                <p className="mb-6 italic text-espresso/40">
+                                    Anda belum memiliki pesanan.
+                                </p>
+                                <Link href="/#menu" className="btn-premium">
+                                    Pesan Sekarang
+                                </Link>
                             </div>
                         ) : (
                             <div className="space-y-4">
-                                {orders.map(order => (
-                                    <div key={order.id} className="bg-white rounded-2xl border border-gold/20 p-6">
-                                        <div className="flex items-center justify-between mb-4">
+                                {orders.map((order) => (
+                                    <div
+                                        key={order.id}
+                                        className="rounded-2xl border border-gold/20 bg-white p-6"
+                                    >
+                                        <div className="mb-4 flex items-center justify-between">
                                             <div>
-                                                <p className="font-bold text-espresso text-lg">Pesanan #{order.id}</p>
-                                                <p className="text-espresso/40 text-sm">{order.created_at}</p>
+                                                <p className="text-lg font-bold text-espresso">
+                                                    <span className="font-mono text-base font-bold text-gold">
+                                                        {order.order_number}
+                                                    </span>
+                                                    <span className="font-normal text-espresso/20">
+                                                        {' '}|{' '}
+                                                    </span>
+                                                    <span className="text-base font-normal text-espresso/40">
+                                                        {new Date(
+                                                            order.created_at,
+                                                        ).toLocaleDateString(
+                                                            'id-ID',
+                                                            {
+                                                                year: 'numeric',
+                                                                month: 'long',
+                                                                day: 'numeric',
+                                                                timeZone: 'Asia/Jakarta',
+                                                            },
+                                                        ) + ' • ' + new Date(
+                                                            order.created_at,
+                                                        ).toLocaleTimeString(
+                                                            'id-ID',
+                                                            {
+                                                                hour: '2-digit',
+                                                                minute: '2-digit',
+                                                                timeZone: 'Asia/Jakarta',
+                                                            },
+                                                        )}
+                                                    </span>
+                                                </p>
                                             </div>
-                                            <span className={`px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-widest ${statusClass(order.status)}`}>
+                                            <span
+                                                className={`rounded-full px-4 py-1.5 text-sm font-bold uppercase tracking-widest ${statusClass(order.status)}`}
+                                            >
                                                 {statusLabel(order.status)}
                                             </span>
                                         </div>
-                                        {order.items && order.items.length > 0 && (
-                                            <div className="border-t border-gold/10 pt-3 space-y-2">
-                                                {order.items.map((item, i) => (
-                                                    <div key={i} className="flex justify-between items-center text-sm">
-                                                        <div>
-                                                            <span className="text-espresso font-medium">{item.name}</span>
-                                                            {variantLabel(item) && <span className="text-espresso/40 text-xs ml-2">{variantLabel(item)}</span>}
-                                                            <span className="text-espresso/40 ml-2">x{item.quantity}</span>
-                                                        </div>
-                                                        <span className="text-gold font-medium">Rp {(item.price * item.quantity).toLocaleString('id-ID')}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                        <div className="border-t border-gold/10 pt-3 mt-3 flex justify-between items-center">
-                                            <span className="text-espresso font-bold">Total</span>
-                                            <span className="text-gold font-bold text-xl">Rp {Number(order.total).toLocaleString('id-ID')}</span>
+                                        {order.items &&
+                                            order.items.length > 0 && (
+                                                <div className="space-y-2 border-t border-gold/10 pt-3">
+                                                    {order.items.map(
+                                                        (item, i) => (
+                                                            <div
+                                                                key={i}
+                                                                className="flex items-center justify-between text-sm"
+                                                            >
+                                                                <div>
+                                                                    <span className="font-medium text-espresso">
+                                                                        {
+                                                                            item.name
+                                                                        }
+                                                                    </span>
+                                                                    {variantLabel(
+                                                                        item,
+                                                                    ) && (
+                                                                        <span className="ml-2 text-xs text-espresso/40">
+                                                                            {variantLabel(
+                                                                                item,
+                                                                            )}
+                                                                        </span>
+                                                                    )}
+                                                                    <span className="ml-2 text-espresso/40">
+                                                                        x
+                                                                        {
+                                                                            item.quantity
+                                                                        }
+                                                                    </span>
+                                                                </div>
+                                                                <span className="font-medium text-gold">
+                                                                    Rp{' '}
+                                                                    {(
+                                                                        item.price *
+                                                                        item.quantity
+                                                                    ).toLocaleString(
+                                                                        'id-ID',
+                                                                    )}
+                                                                </span>
+                                                            </div>
+                                                        ),
+                                                    )}
+                                                </div>
+                                            )}
+                                        <div className="mt-3 flex items-center justify-between border-t border-gold/10 pt-3">
+                                            <span className="font-bold text-espresso">
+                                                Total
+                                            </span>
+                                            <span className="text-xl font-bold text-gold">
+                                                Rp{' '}
+                                                {Number(
+                                                    order.total,
+                                                ).toLocaleString('id-ID')}
+                                            </span>
                                         </div>
                                     </div>
                                 ))}

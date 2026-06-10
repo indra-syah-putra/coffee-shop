@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\PromoController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Models\Category;
 use App\Models\MenuItem;
 use App\Models\Promo;
 use App\Models\Setting;
@@ -30,12 +31,26 @@ Route::get('/terms', function () {
 })->name('terms');
 
 Route::get('/', function () {
+    $popularItems = MenuItem::with(['category', 'optionValues', 'toppings'])
+        ->select('menu_items.*')
+        ->selectRaw('COUNT(order_items.id) as total_orders')
+        ->join('order_items', 'menu_items.id', '=', 'order_items.menu_item_id')
+        ->join('orders', 'order_items.order_id', '=', 'orders.id')
+        ->where('menu_items.active', true)
+        ->whereIn('orders.status', ['confirmed', 'processing', 'completed'])
+        ->groupBy('menu_items.id')
+        ->orderByDesc('total_orders')
+        ->limit(5)
+        ->get();
+
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
         'menuItems' => MenuItem::with(['category', 'optionValues', 'toppings'])->where('active', true)->orderBy('name')->get(),
+        'categories' => Category::where('active', true)->orderBy('name')->pluck('name'),
         'promos' => Promo::active()->get(),
         'settings' => Setting::all()->keyBy('key')->map->value,
+        'popularItems' => $popularItems,
     ]);
 });
 

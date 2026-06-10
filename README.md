@@ -23,12 +23,32 @@ Aplikasi manajemen kedai kopi berbasis web yang dibuat menggunakan Laravel 11, I
 | **Database** | MySQL |
 | **Build Tool** | Vite, Laravel Vite Plugin |
 
-## Persyaratan Sistem
-Sebelum menjalankan project ini, pastikan perangkat kamu sudah terinstal:
- * PHP (minimal versi 8.2)
- * Composer
- * Node.js & npm
- * MySQL atau MariaDB
+## Features
+
+- **Menu Management** — Browse coffee and non-coffee menus with categories, types, and caffeine info
+- **Online Booking** — Reserve tables with date, time, guest count, and table type selection
+- **Order System** — Place food & beverage orders online
+- **Admin Dashboard** — Manage menu items, bookings, and orders
+- **User Authentication** — Login/register with admin role support
+- **Cart & Checkout** — Simple cart workflow for orders
+
+## Tech Stack
+
+| Layer    | Technology                          |
+| -------- | ----------------------------------- |
+| Backend  | Laravel 11, PHP 8.2+                |
+| Frontend | React 18, Inertia.js, Tailwind CSS  |
+| Database | MySQL (via Laravel migrations)      |
+| Build    | Vite, Laravel Vite Plugin           |
+
+## Requirements
+
+- PHP ^8.2
+- Composer
+- Node.js & npm
+- MySQL / MariaDB
+
+## Installation
 
 ## Cara Instalasi
 Ikuti langkah-langkah berikut untuk menjalankan project di lokal komputer kamu:

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -36,7 +37,40 @@ class ReportController extends Controller
             ];
         })->sortByDesc('quantity')->values();
 
+        // Daily revenue (Line chart)
+        $dailyRevenue = $orders->groupBy(function ($order) {
+            return $order->created_at->format('Y-m-d');
+        })->map(function ($dayOrders) {
+            return [
+                'date' => $dayOrders->first()->created_at->format('Y-m-d'),
+                'revenue' => (int) $dayOrders->sum('total'),
+            ];
+        })->sortBy('date')->values();
+
+        // Daily orders (Area chart)
+        $dailyOrders = $orders->groupBy(function ($order) {
+            return $order->created_at->format('Y-m-d');
+        })->map(function ($dayOrders) {
+            return [
+                'date' => $dayOrders->first()->created_at->format('Y-m-d'),
+                'orders' => $dayOrders->count(),
+            ];
+        })->sortBy('date')->values();
+
+        // Category distribution (Pie chart)
+        $categoryDistribution = OrderItem::whereHas('order', function ($q) use ($startDate, $endDate) {
+            $q->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
+        })->with('menuItem.category')->get()->groupBy(function ($item) {
+            return $item->menuItem?->category?->name ?? 'Tanpa Kategori';
+        })->map(function ($items, $name) {
+            return [
+                'name' => $name,
+                'value' => $items->sum('quantity'),
+            ];
+        })->sortByDesc('value')->values();
+
         return Inertia::render('Admin/Reports', [
+            'tab' => $request->get('tab', 'ringkasan'),
             'startDate' => $startDate,
             'endDate' => $endDate,
             'stats' => [
@@ -45,6 +79,9 @@ class ReportController extends Controller
                 'totalDiscount' => $totalDiscount,
             ],
             'itemSales' => $itemSales,
+            'dailyRevenue' => $dailyRevenue,
+            'dailyOrders' => $dailyOrders,
+            'categoryDistribution' => $categoryDistribution,
         ]);
     }
 

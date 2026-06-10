@@ -21,7 +21,7 @@ createInertiaApp({
         root.render(
             <CartProvider>
                 <App {...props} />
-            </CartProvider>
+            </CartProvider>,
         );
     },
     progress: {

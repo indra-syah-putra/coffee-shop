@@ -1,4 +1,3 @@
-import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
@@ -20,7 +19,9 @@ export default function AuthenticatedLayout({ header, children }) {
                         <div className="flex">
                             <div className="flex shrink-0 items-center">
                                 <Link href="/">
-                                    <span className="text-xl font-bold text-white tracking-tighter">KAFEIN</span>
+                                    <span className="text-xl font-bold tracking-tighter text-white">
+                                        KAFEIN
+                                    </span>
                                 </Link>
                             </div>
 
@@ -43,7 +44,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                         <span className="inline-flex rounded-md">
                                             <button
                                                 type="button"
-                                                className="inline-flex items-center rounded-md border border-transparent bg-espresso px-3 py-2 text-sm font-medium leading-4 text-cream hover:text-gold focus:outline-none transition ease-in-out duration-150"
+                                                className="inline-flex items-center rounded-md border border-transparent bg-espresso px-3 py-2 text-sm font-medium leading-4 text-cream transition duration-150 ease-in-out hover:text-gold focus:outline-none"
                                             >
                                                 {user.name}
 
@@ -137,9 +138,7 @@ export default function AuthenticatedLayout({ header, children }) {
                         ' sm:hidden'
                     }
                 >
-                    <div className="space-y-1 pb-3 pt-2">
-
-                    </div>
+                    <div className="space-y-1 pb-3 pt-2"></div>
 
                     <div className="border-t border-gold/10 pb-1 pt-4">
                         <div className="px-4">
@@ -156,7 +155,9 @@ export default function AuthenticatedLayout({ header, children }) {
                                 Profil
                             </ResponsiveNavLink>
                             {user.is_admin && (
-                                <ResponsiveNavLink href={route('admin.dashboard')}>
+                                <ResponsiveNavLink
+                                    href={route('admin.dashboard')}
+                                >
                                     Admin
                                 </ResponsiveNavLink>
                             )}
@@ -173,13 +174,13 @@ export default function AuthenticatedLayout({ header, children }) {
             </nav>
 
             {flash?.success && (
-                <div className="bg-green-100 border-b border-green-300 text-green-800 text-center py-3 text-sm font-semibold">
+                <div className="border-b border-green-300 bg-green-100 py-3 text-center text-sm font-semibold text-green-800">
                     {flash.success}
                 </div>
             )}
 
             {header && (
-                <header className="bg-cream-dark/80 backdrop-blur-sm border-b border-gold/10">
+                <header className="border-b border-gold/10 bg-cream-dark/80 backdrop-blur-sm">
                     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                         {header}
                     </div>

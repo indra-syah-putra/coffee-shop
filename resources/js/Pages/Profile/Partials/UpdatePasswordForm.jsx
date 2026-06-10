@@ -51,23 +51,32 @@ export default function UpdatePasswordForm() {
                     Perbarui Kata Sandi
                 </h2>
                 <p className="mt-1 text-sm text-light-brown">
-                    Pastikan akun Anda menggunakan kata sandi yang panjang dan acak agar tetap aman.
+                    Pastikan akun Anda menggunakan kata sandi yang panjang dan
+                    acak agar tetap aman.
                 </p>
             </header>
 
             <form onSubmit={updatePassword} className="mt-6 space-y-6">
                 <div>
-                    <InputLabel htmlFor="current_password" value="Kata Sandi Saat Ini" />
+                    <InputLabel
+                        htmlFor="current_password"
+                        value="Kata Sandi Saat Ini"
+                    />
                     <TextInput
                         id="current_password"
                         ref={currentPasswordInput}
                         value={data.current_password}
-                        onChange={(e) => setData('current_password', e.target.value)}
+                        onChange={(e) =>
+                            setData('current_password', e.target.value)
+                        }
                         type="password"
                         className="mt-1 block w-full"
                         autoComplete="current-password"
                     />
-                    <InputError message={errors.current_password} className="mt-2" />
+                    <InputError
+                        message={errors.current_password}
+                        className="mt-2"
+                    />
                 </div>
 
                 <div>
@@ -85,16 +94,24 @@ export default function UpdatePasswordForm() {
                 </div>
 
                 <div>
-                    <InputLabel htmlFor="password_confirmation" value="Konfirmasi Kata Sandi" />
+                    <InputLabel
+                        htmlFor="password_confirmation"
+                        value="Konfirmasi Kata Sandi"
+                    />
                     <TextInput
                         id="password_confirmation"
                         value={data.password_confirmation}
-                        onChange={(e) => setData('password_confirmation', e.target.value)}
+                        onChange={(e) =>
+                            setData('password_confirmation', e.target.value)
+                        }
                         type="password"
                         className="mt-1 block w-full"
                         autoComplete="new-password"
                     />
-                    <InputError message={errors.password_confirmation} className="mt-2" />
+                    <InputError
+                        message={errors.password_confirmation}
+                        className="mt-2"
+                    />
                 </div>
 
                 <div className="flex items-center gap-4">
@@ -108,7 +125,9 @@ export default function UpdatePasswordForm() {
                         leaveFrom="opacity-100"
                         leaveTo="opacity-0"
                     >
-                        <p className="text-sm font-medium text-green-700">Tersimpan.</p>
+                        <p className="text-sm font-medium text-green-700">
+                            Tersimpan.
+                        </p>
                     </Transition>
                 </div>
             </form>

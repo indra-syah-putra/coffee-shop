@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Booking extends Model
 {
-    protected $fillable = ['user_id', 'date', 'start_time', 'end_time', 'guests', 'table_type', 'notes', 'price', 'status', 'admin_notes'];
+    protected $fillable = ['booking_number', 'user_id', 'date', 'start_time', 'end_time', 'guests', 'table_type', 'notes', 'price', 'status', 'admin_notes'];
 
     protected function casts(): array
     {

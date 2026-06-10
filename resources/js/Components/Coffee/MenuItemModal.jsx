@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { router } from '@inertiajs/react';
 import { useCart } from '@/Contexts/CartContext';
+import { router } from '@inertiajs/react';
+import { useState } from 'react';
 
 export default function MenuItemModal({ item, onClose, auth }) {
     const { addItem } = useCart();
@@ -11,7 +11,8 @@ export default function MenuItemModal({ item, onClose, auth }) {
     const [toppings, setToppings] = useState([]);
     const [qty, setQty] = useState(1);
 
-    const getOptionByType = (type) => (item.option_values || []).filter(ov => ov.type === type);
+    const getOptionByType = (type) =>
+        (item.option_values || []).filter((ov) => ov.type === type);
 
     const sizes = getOptionByType('size');
     const temperatures = getOptionByType('temperature');
@@ -21,15 +22,17 @@ export default function MenuItemModal({ item, onClose, auth }) {
     const calcPrice = () => {
         let price = Number(item.price);
         if (size) {
-            const s = sizes.find(s => s.id === size);
-            if (s?.pivot?.price) price = Number(s.pivot.price);
+            const s = sizes.find((s) => s.id === size);
+            if (s?.pivot?.price) price += Number(s.pivot.price);
         }
         if (temperature) {
-            const t = temperatures.find(t => t.id === temperature);
-            if (t?.pivot?.price) price = Number(t.pivot.price);
+            const t = temperatures.find((t) => t.id === temperature);
+            if (t?.pivot?.price) price += Number(t.pivot.price);
         }
-        toppings.forEach(tId => {
-            const top = (item.toppings || []).find(t => String(t.id) === String(tId));
+        toppings.forEach((tId) => {
+            const top = (item.toppings || []).find(
+                (t) => String(t.id) === String(tId),
+            );
             if (top) price += Number(top.price);
         });
         return price * qty;
@@ -38,15 +41,17 @@ export default function MenuItemModal({ item, onClose, auth }) {
     const getUnitPrice = () => {
         let price = Number(item.price);
         if (size) {
-            const s = sizes.find(s => s.id === size);
-            if (s?.pivot?.price) price = Number(s.pivot.price);
+            const s = sizes.find((s) => s.id === size);
+            if (s?.pivot?.price) price += Number(s.pivot.price);
         }
         if (temperature) {
-            const t = temperatures.find(t => t.id === temperature);
-            if (t?.pivot?.price) price = Number(t.pivot.price);
+            const t = temperatures.find((t) => t.id === temperature);
+            if (t?.pivot?.price) price += Number(t.pivot.price);
         }
-        toppings.forEach(tId => {
-            const top = (item.toppings || []).find(t => String(t.id) === String(tId));
+        toppings.forEach((tId) => {
+            const top = (item.toppings || []).find(
+                (t) => String(t.id) === String(tId),
+            );
             if (top) price += Number(top.price);
         });
         return price;
@@ -54,7 +59,7 @@ export default function MenuItemModal({ item, onClose, auth }) {
 
     const getDisplayName = () => {
         const parts = [item.name];
-        const sizeName = sizes.find(s => s.id === size)?.name;
+        const sizeName = sizes.find((s) => s.id === size)?.name;
         if (sizeName) parts.push(`(${sizeName})`);
         return parts.join(' ');
     };
@@ -67,10 +72,14 @@ export default function MenuItemModal({ item, onClose, auth }) {
                 name: getDisplayName(),
                 price: unitPrice,
                 image: item.image,
-                size: sizes.find(s => s.id === size)?.name || null,
-                temperature: temperatures.find(t => t.id === temperature)?.name || null,
-                ice_level: iceLevels.find(i => i.id === iceLevel)?.name || null,
-                sugar_level: sugarLevels.find(s => s.id === sugarLevel)?.name || null,
+                size: sizes.find((s) => s.id === size)?.name || null,
+                temperature:
+                    temperatures.find((t) => t.id === temperature)?.name ||
+                    null,
+                ice_level:
+                    iceLevels.find((i) => i.id === iceLevel)?.name || null,
+                sugar_level:
+                    sugarLevels.find((s) => s.id === sugarLevel)?.name || null,
                 toppings,
             });
         }
@@ -87,10 +96,14 @@ export default function MenuItemModal({ item, onClose, auth }) {
                 price: unitPrice,
                 image: item.image,
                 quantity: 1,
-                size: sizes.find(s => s.id === size)?.name || null,
-                temperature: temperatures.find(t => t.id === temperature)?.name || null,
-                ice_level: iceLevels.find(i => i.id === iceLevel)?.name || null,
-                sugar_level: sugarLevels.find(s => s.id === sugarLevel)?.name || null,
+                size: sizes.find((s) => s.id === size)?.name || null,
+                temperature:
+                    temperatures.find((t) => t.id === temperature)?.name ||
+                    null,
+                ice_level:
+                    iceLevels.find((i) => i.id === iceLevel)?.name || null,
+                sugar_level:
+                    sugarLevels.find((s) => s.id === sugarLevel)?.name || null,
                 toppings,
             });
         }
@@ -99,8 +112,8 @@ export default function MenuItemModal({ item, onClose, auth }) {
     };
 
     const toggleTopping = (tId) => {
-        setToppings(prev =>
-            prev.includes(tId) ? prev.filter(x => x !== tId) : [...prev, tId]
+        setToppings((prev) =>
+            prev.includes(tId) ? prev.filter((x) => x !== tId) : [...prev, tId],
         );
     };
 
@@ -111,49 +124,95 @@ export default function MenuItemModal({ item, onClose, auth }) {
                 : 'border-gold/20 text-espresso/60 hover:border-gold hover:text-espresso'
         }`;
 
-    const groupLabel = (text) =>
-        <span className="text-[10px] font-bold text-espresso/40 uppercase tracking-widest block mb-2">{text}</span>;
+    const groupLabel = (text) => (
+        <span className="mb-2 block text-[10px] font-bold uppercase tracking-widest text-espresso/40">
+            {text}
+        </span>
+    );
 
     const price = calcPrice();
 
+    const canOrder = () => {
+        if (sizes.length > 0 && !size) return false;
+        if (temperatures.length > 0 && !temperature) return false;
+        if (sugarLevels.length > 0 && !sugarLevel) return false;
+        return true;
+    };
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-            <div className="relative bg-white rounded-3xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div
+                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                onClick={onClose}
+            />
+            <div className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl bg-white shadow-2xl">
                 {/* Close */}
-                <button onClick={onClose} className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-espresso/60 hover:text-espresso shadow-sm transition-all">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                <button
+                    onClick={onClose}
+                    className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-espresso/60 shadow-sm backdrop-blur-sm transition-all hover:text-espresso"
+                >
+                    <svg
+                        className="h-5 w-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M6 18L18 6M6 6l12 12"
+                        />
                     </svg>
                 </button>
 
                 {/* Image */}
                 <div className="relative h-56 overflow-hidden rounded-t-3xl">
-                    <img
-                        src={item.image ? `/storage/${item.image}` : '/images/latte.png'}
-                        alt={item.name}
-                        className="w-full h-full object-cover"
-                    />
+                    {item.image ? (
+                        <img
+                            src={`/storage/${item.image}`}
+                            alt={item.name}
+                            className="h-full w-full object-cover"
+                        />
+                    ) : (
+                        <div className="h-full w-full bg-[#D4C5B5]" />
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                     <div className="absolute bottom-4 left-6">
-                        <h3 className="text-2xl font-bold text-white">{item.name}</h3>
+                        <h3 className="text-2xl font-bold text-white">
+                            {item.name}
+                        </h3>
                         {item.description && (
-                            <p className="text-white/70 text-sm mt-1 line-clamp-1">{item.description}</p>
+                            <p className="mt-1 line-clamp-1 text-sm text-white/70">
+                                {item.description}
+                            </p>
                         )}
                     </div>
                 </div>
 
-                <div className="p-6 space-y-5">
+                <div className="space-y-5 p-6">
                     {/* Size */}
                     {sizes.length > 0 && (
                         <div>
                             {groupLabel('Pilih Ukuran')}
-                            <div className="flex gap-2 flex-wrap">
-                                {sizes.map(s => (
-                                    <button key={s.id} onClick={() => setSize(s.id)}
-                                        className={chipClass(size === s.id)}>
+                            <div className="flex flex-wrap gap-2">
+                                {sizes.map((s) => (
+                                    <button
+                                        key={s.id}
+                                        onClick={() => setSize(s.id)}
+                                        className={chipClass(size === s.id)}
+                                    >
                                         {s.name}
-                                        {s.pivot?.price ? <span className="ml-1.5 opacity-60">Rp {Number(s.pivot.price).toLocaleString('id-ID')}</span> : ''}
+                                        {s.pivot?.price ? (
+                                            <span className="ml-1.5 opacity-60">
+                                                +Rp{' '}
+                                                {Number(
+                                                    s.pivot.price,
+                                                ).toLocaleString('id-ID')}
+                                            </span>
+                                        ) : (
+                                            ''
+                                        )}
                                     </button>
                                 ))}
                             </div>
@@ -164,12 +223,40 @@ export default function MenuItemModal({ item, onClose, auth }) {
                     {temperatures.length > 0 && (
                         <div>
                             {groupLabel('Pilih Suhu')}
-                            <div className="flex gap-2 flex-wrap">
-                                {temperatures.map(t => (
-                                    <button key={t.id} onClick={() => { setTemperature(t.id); if (t.name !== 'Dingin') setIceLevel(null); }}
-                                        className={chipClass(temperature === t.id)}>
+                            <div className="flex flex-wrap gap-2">
+                                {temperatures.map((t) => (
+                                    <button
+                                        key={t.id}
+                                        onClick={() => {
+                                            setTemperature(t.id);
+                                            if (t.name === 'Dingin') {
+                                                const defaultIce =
+                                                    iceLevels.find(
+                                                        (i) =>
+                                                            i.name ===
+                                                            'Es Biasa',
+                                                    );
+                                                if (defaultIce)
+                                                    setIceLevel(defaultIce.id);
+                                            } else {
+                                                setIceLevel(null);
+                                            }
+                                        }}
+                                        className={chipClass(
+                                            temperature === t.id,
+                                        )}
+                                    >
                                         {t.name}
-                                        {t.pivot?.price ? <span className="ml-1.5 opacity-60">Rp {Number(t.pivot.price).toLocaleString('id-ID')}</span> : ''}
+                                        {t.pivot?.price ? (
+                                            <span className="ml-1.5 opacity-60">
+                                                +Rp{' '}
+                                                {Number(
+                                                    t.pivot.price,
+                                                ).toLocaleString('id-ID')}
+                                            </span>
+                                        ) : (
+                                            ''
+                                        )}
                                     </button>
                                 ))}
                             </div>
@@ -177,32 +264,48 @@ export default function MenuItemModal({ item, onClose, auth }) {
                     )}
 
                     {/* Ice Level (only if temperature is Dingin) */}
-                    {temperature && iceLevels.length > 0 && (() => {
-                        const tempName = temperatures.find(t => t.id === temperature)?.name;
-                        if (tempName !== 'Dingin') return null;
-                        return (
-                            <div>
-                                {groupLabel('Level Es Batu')}
-                                <div className="flex gap-2 flex-wrap">
-                                    {iceLevels.map(i => (
-                                        <button key={i.id} onClick={() => setIceLevel(i.id)}
-                                            className={chipClass(iceLevel === i.id)}>
-                                            {i.name}
-                                        </button>
-                                    ))}
+                    {temperature &&
+                        iceLevels.length > 0 &&
+                        (() => {
+                            const tempName = temperatures.find(
+                                (t) => t.id === temperature,
+                            )?.name;
+                            if (tempName !== 'Dingin') return null;
+                            return (
+                                <div>
+                                    {groupLabel('Level Es Batu')}
+                                    <div className="flex flex-wrap gap-2">
+                                        {iceLevels.map((i) => (
+                                            <button
+                                                key={i.id}
+                                                onClick={() =>
+                                                    setIceLevel(i.id)
+                                                }
+                                                className={chipClass(
+                                                    iceLevel === i.id,
+                                                )}
+                                            >
+                                                {i.name}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
-                        );
-                    })()}
+                            );
+                        })()}
 
                     {/* Sugar Level */}
                     {sugarLevels.length > 0 && (
                         <div>
                             {groupLabel('Level Gula')}
-                            <div className="flex gap-2 flex-wrap">
-                                {sugarLevels.map(s => (
-                                    <button key={s.id} onClick={() => setSugarLevel(s.id)}
-                                        className={chipClass(sugarLevel === s.id)}>
+                            <div className="flex flex-wrap gap-2">
+                                {sugarLevels.map((s) => (
+                                    <button
+                                        key={s.id}
+                                        onClick={() => setSugarLevel(s.id)}
+                                        className={chipClass(
+                                            sugarLevel === s.id,
+                                        )}
+                                    >
                                         {s.name}
                                     </button>
                                 ))}
@@ -214,13 +317,23 @@ export default function MenuItemModal({ item, onClose, auth }) {
                     {item.toppings?.length > 0 && (
                         <div>
                             {groupLabel('Topping')}
-                            <div className="flex gap-2 flex-wrap">
-                                {item.toppings.map(t => {
-                                    const selected = toppings.includes(String(t.id));
+                            <div className="flex flex-wrap gap-2">
+                                {item.toppings.map((t) => {
+                                    const selected = toppings.includes(
+                                        String(t.id),
+                                    );
                                     return (
-                                        <button key={t.id} onClick={() => toggleTopping(String(t.id))}
-                                            className={chipClass(selected)}>
-                                            +{t.name} Rp {Number(t.price).toLocaleString('id-ID')}
+                                        <button
+                                            key={t.id}
+                                            onClick={() =>
+                                                toggleTopping(String(t.id))
+                                            }
+                                            className={chipClass(selected)}
+                                        >
+                                            +{t.name} Rp{' '}
+                                            {Number(t.price).toLocaleString(
+                                                'id-ID',
+                                            )}
                                         </button>
                                     );
                                 })}
@@ -232,43 +345,89 @@ export default function MenuItemModal({ item, onClose, auth }) {
                     <div className="text-center">
                         {groupLabel('Jumlah')}
                         <div className="flex items-center justify-center space-x-4">
-                            <button onClick={() => setQty(Math.max(1, qty - 1))}
-                                className="w-10 h-10 rounded-xl border border-gold/20 flex items-center justify-center text-espresso hover:border-gold hover:bg-gold/5 transition-all font-bold text-lg">
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 12H4" />
+                            <button
+                                onClick={() => setQty(Math.max(1, qty - 1))}
+                                className="flex h-10 w-10 items-center justify-center rounded-xl border border-gold/20 text-lg font-bold text-espresso transition-all hover:border-gold hover:bg-gold/5"
+                            >
+                                <svg
+                                    className="h-4 w-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M20 12H4"
+                                    />
                                 </svg>
                             </button>
-                            <span className="text-2xl font-bold text-espresso w-12 text-center">{qty}</span>
-                            <button onClick={() => setQty(qty + 1)}
-                                className="w-10 h-10 rounded-xl border border-gold/20 flex items-center justify-center text-espresso hover:border-gold hover:bg-gold/5 transition-all font-bold text-lg">
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                            <span className="w-12 text-center text-2xl font-bold text-espresso">
+                                {qty}
+                            </span>
+                            <button
+                                onClick={() => setQty(qty + 1)}
+                                className="flex h-10 w-10 items-center justify-center rounded-xl border border-gold/20 text-lg font-bold text-espresso transition-all hover:border-gold hover:bg-gold/5"
+                            >
+                                <svg
+                                    className="h-4 w-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M12 4v16m8-8H4"
+                                    />
                                 </svg>
                             </button>
                         </div>
                     </div>
 
                     {/* Price & Actions */}
-                    <div className="pt-4 border-t border-gold/10">
-                        <div className="flex items-center justify-between mb-4">
-                            <span className="text-espresso/60 text-sm">Total Harga</span>
-                            <span className="text-2xl font-bold text-gold">Rp {price.toLocaleString('id-ID')}</span>
+                    <div className="border-t border-gold/10 pt-4">
+                        <div className="mb-4 flex items-center justify-between">
+                            <span className="text-sm text-espresso/60">
+                                Total Harga
+                            </span>
+                            <span className="text-2xl font-bold text-gold">
+                                Rp {price.toLocaleString('id-ID')}
+                            </span>
                         </div>
 
                         {auth?.user ? (
                             <div className="flex space-x-3">
-                                <button onClick={handleAddToCart}
-                                    className="flex-1 px-6 py-3 border-2 border-espresso text-espresso font-bold rounded-xl hover:bg-espresso hover:text-white transition-all duration-300 text-sm">
+                                <button
+                                    onClick={handleAddToCart}
+                                    disabled={!canOrder()}
+                                    className={`flex-1 rounded-xl border-2 px-6 py-3 text-sm font-bold transition-all duration-300 ${
+                                        canOrder()
+                                            ? 'border-espresso text-espresso hover:bg-espresso hover:text-white'
+                                            : 'cursor-not-allowed border-espresso/20 text-espresso/20'
+                                    }`}
+                                >
                                     + Keranjang
                                 </button>
-                                <button onClick={handleBuyNow}
-                                    className="flex-1 px-6 py-3 bg-gradient-to-r from-gold to-gold-light text-espresso font-bold rounded-xl hover:shadow-lg hover:shadow-gold/30 transition-all duration-300 text-sm">
+                                <button
+                                    onClick={handleBuyNow}
+                                    disabled={!canOrder()}
+                                    className={`flex-1 rounded-xl px-6 py-3 text-sm font-bold transition-all duration-300 ${
+                                        canOrder()
+                                            ? 'bg-gradient-to-r from-gold to-gold-light text-espresso hover:shadow-lg hover:shadow-gold/30'
+                                            : 'cursor-not-allowed bg-gold/10 text-espresso/20'
+                                    }`}
+                                >
                                     Beli Sekarang
                                 </button>
                             </div>
                         ) : (
-                            <button onClick={() => router.get(route('login'))}
-                                className="w-full px-6 py-3 bg-espresso text-white font-bold rounded-xl hover:bg-espresso/90 transition-all text-sm">
+                            <button
+                                onClick={() => router.get(route('login'))}
+                                className="w-full rounded-xl bg-espresso px-6 py-3 text-sm font-bold text-white transition-all hover:bg-espresso/90"
+                            >
                                 Masuk untuk Memesan
                             </button>
                         )}

@@ -25,7 +25,7 @@ class OrderController extends Controller
         ]);
 
         $total = 0;
-        $orderItems = [];
+        $grouped = [];
 
         foreach ($validated['items'] as $itemData) {
             $menuItem = MenuItem::with(['optionValues', 'toppings'])->findOrFail($itemData['id']);
@@ -34,31 +34,42 @@ class OrderController extends Controller
             if (!empty($itemData['size'])) {
                 $size = $menuItem->optionValues->firstWhere('name', $itemData['size']);
                 if ($size && $size->pivot->price > 0) {
-                    $price = (float) $size->pivot->price;
+                    $price += (float) $size->pivot->price;
                 }
             }
 
             if (!empty($itemData['temperature'])) {
                 $temp = $menuItem->optionValues->firstWhere('name', $itemData['temperature']);
                 if ($temp && $temp->pivot->price > 0) {
-                    $price = (float) $temp->pivot->price;
+                    $price += (float) $temp->pivot->price;
                 }
             }
 
-            $subtotal = $price * $itemData['quantity'];
-            $total += $subtotal;
+            $toppings = !empty($itemData['toppings']) ? $itemData['toppings'] : null;
+            $key = $menuItem->id . '|' . ($itemData['size'] ?? '') . '|' . ($itemData['temperature'] ?? '') . '|' . ($itemData['sugar_level'] ?? '') . '|' . ($itemData['ice_level'] ?? '') . '|' . json_encode($toppings);
 
-            $orderItems[] = [
-                'menu_item_id' => $menuItem->id,
-                'name' => $menuItem->name,
-                'price' => $price,
-                'quantity' => $itemData['quantity'],
-                'size' => $itemData['size'] ?? null,
-                'temperature' => $itemData['temperature'] ?? null,
-                'sugar_level' => $itemData['sugar_level'] ?? null,
-                'ice_level' => $itemData['ice_level'] ?? null,
-                'toppings' => !empty($itemData['toppings']) ? $itemData['toppings'] : null,
-            ];
+            if (isset($grouped[$key])) {
+                $grouped[$key]['quantity'] += $itemData['quantity'];
+            } else {
+                $grouped[$key] = [
+                    'menu_item_id' => $menuItem->id,
+                    'name' => $menuItem->name,
+                    'price' => $price,
+                    'quantity' => $itemData['quantity'],
+                    'size' => $itemData['size'] ?? null,
+                    'temperature' => $itemData['temperature'] ?? null,
+                    'sugar_level' => $itemData['sugar_level'] ?? null,
+                    'ice_level' => $itemData['ice_level'] ?? null,
+                    'toppings' => $toppings,
+                ];
+            }
+        }
+
+        $orderItems = [];
+        foreach ($grouped as $entry) {
+            $subtotal = $entry['price'] * $entry['quantity'];
+            $total += $subtotal;
+            $orderItems[] = $entry;
         }
 
         $discount = 0;
@@ -76,7 +87,12 @@ class OrderController extends Controller
             }
         }
 
+        do {
+            $orderNumber = now()->timezone('Asia/Jakarta')->format('dmyHi') . str_pad(mt_rand(0, 99), 2, '0', STR_PAD_LEFT) . 'KAF';
+        } while (\App\Models\Order::where('order_number', $orderNumber)->exists());
+
         $order = $request->user()->orders()->create([
+            'order_number' => $orderNumber,
             'total' => $total - $discount,
             'status' => 'pending',
             'promo_id' => $promoId,
@@ -99,22 +115,34 @@ class OrderController extends Controller
             'orders' => $request->user()->orders()->with('items')->orderBy('created_at', 'desc')->get()->map(function ($order) {
                 return [
                     'id' => $order->id,
+                    'order_number' => $order->order_number,
                     'total' => $order->total,
                     'discount' => $order->discount,
                     'status' => $order->status,
-                    'created_at' => $order->created_at->format('d M Y H:i'),
-                    'items' => $order->items->map(function ($item) {
-                        return [
-                            'name' => $item->name,
-                            'price' => $item->price,
-                            'quantity' => $item->quantity,
-                            'size' => $item->size,
-                            'temperature' => $item->temperature,
-                            'sugar_level' => $item->sugar_level,
-                            'ice_level' => $item->ice_level,
-                            'toppings' => $item->toppings,
-                        ];
-                    }),
+                    'created_at' => $order->created_at->toIso8601String(),
+                    'items' => $order->items
+                        ->groupBy(function ($item) {
+                            return $item->name . '|' .
+                                ($item->size ?? '') . '|' .
+                                ($item->temperature ?? '') . '|' .
+                                ($item->sugar_level ?? '') . '|' .
+                                ($item->ice_level ?? '') . '|' .
+                                json_encode($item->toppings);
+                        })
+                        ->values()
+                        ->map(function ($group) {
+                            $first = $group->first();
+                            return [
+                                'name' => $first->name,
+                                'price' => $first->price,
+                                'quantity' => $group->sum('quantity'),
+                                'size' => $first->size,
+                                'temperature' => $first->temperature,
+                                'sugar_level' => $first->sugar_level,
+                                'ice_level' => $first->ice_level,
+                                'toppings' => $first->toppings,
+                            ];
+                        }),
                 ];
             }),
         ]);

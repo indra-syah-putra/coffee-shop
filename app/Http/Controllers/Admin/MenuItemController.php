@@ -56,19 +56,27 @@ class MenuItemController extends Controller
     public function update(Request $request, MenuItem $menuItem)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'category_id' => 'required|exists:categories,id',
+            'name' => 'sometimes|required|string|max:255',
+            'price' => 'sometimes|required|numeric|min:0',
+            'category_id' => 'sometimes|required|exists:categories,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'description' => 'nullable|string',
             'option_values' => 'nullable|array',
             'option_values.*' => 'exists:menu_option_values,id',
         ]);
 
-        $menuItem->name = $validated['name'];
-        $menuItem->price = $validated['price'];
-        $menuItem->category_id = $validated['category_id'];
-        $menuItem->description = $validated['description'] ?? null;
+        if (isset($validated['name'])) {
+            $menuItem->name = $validated['name'];
+        }
+        if (isset($validated['price'])) {
+            $menuItem->price = $validated['price'];
+        }
+        if (isset($validated['category_id'])) {
+            $menuItem->category_id = $validated['category_id'];
+        }
+        if (array_key_exists('description', $validated)) {
+            $menuItem->description = $validated['description'];
+        }
 
         if ($request->hasFile('image')) {
             if ($menuItem->image) {
@@ -79,7 +87,7 @@ class MenuItemController extends Controller
 
         $menuItem->save();
 
-        if (isset($validated['option_values'])) {
+        if ($request->has('option_values')) {
             $this->syncOptionValues($menuItem, $request);
         }
 

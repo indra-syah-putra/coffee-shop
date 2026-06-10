@@ -59,11 +59,27 @@ export default function UpdateProfileInformation({
                 <div>
                     <InputLabel value="Foto Profil" />
                     <div className="mt-2 flex items-center gap-6">
-                        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gold/20 text-2xl font-bold text-espresso/40 shrink-0 overflow-hidden">
+                        <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gold/20 text-2xl font-bold text-espresso/40">
                             {preview ? (
-                                <img src={preview} alt="Preview" className="h-full w-full object-cover" />
+                                <img
+                                    src={preview}
+                                    alt="Preview"
+                                    className="h-full w-full object-cover"
+                                />
                             ) : (
-                                <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                                <svg
+                                    className="h-8 w-8"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                    />
+                                </svg>
                             )}
                         </div>
                         <div>
@@ -77,7 +93,9 @@ export default function UpdateProfileInformation({
                                     className="hidden"
                                 />
                             </label>
-                            <p className="mt-1 text-xs text-light-brown">JPEG, PNG, or WebP. Maks 2MB.</p>
+                            <p className="mt-1 text-xs text-light-brown">
+                                JPEG, PNG, or WebP. Maks 2MB.
+                            </p>
                         </div>
                     </div>
                     <InputError className="mt-2" message={errors.photo} />
@@ -117,7 +135,9 @@ export default function UpdateProfileInformation({
                         leaveFrom="opacity-100"
                         leaveTo="opacity-0"
                     >
-                        <p className="text-sm font-medium text-green-700">Tersimpan.</p>
+                        <p className="text-sm font-medium text-green-700">
+                            Tersimpan.
+                        </p>
                     </Transition>
                 </div>
             </form>

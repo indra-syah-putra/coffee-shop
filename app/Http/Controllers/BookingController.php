@@ -13,7 +13,7 @@ class BookingController extends Controller
         $validated = $request->validate([
             'date' => 'required|date|after:today',
             'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i|after:start_time',
+            'end_time' => 'required|date_format:H:i',
             'guests' => 'required|integer|min:1|max:20',
             'table_type' => 'required|in:indoor,outdoor,balkon',
             'notes' => 'nullable|string|max:500',
@@ -22,8 +22,13 @@ class BookingController extends Controller
         $start = strtotime($validated['start_time']);
         $end = strtotime($validated['end_time']);
         $hours = ($end - $start) / 3600;
-        $blocks = ceil($hours / 12);
-        $validated['price'] = $blocks * 25000;
+        if ($hours <= 0) $hours += 24;
+        $blocks = ceil($hours / 6);
+        $validated['price'] = $blocks * 15000;
+
+        do {
+            $validated['booking_number'] = now()->timezone('Asia/Jakarta')->format('dmyHi') . str_pad(mt_rand(0, 99), 2, '0', STR_PAD_LEFT) . 'BKG';
+        } while (\App\Models\Booking::where('booking_number', $validated['booking_number'])->exists());
 
         $booking = $request->user()->bookings()->create($validated);
 

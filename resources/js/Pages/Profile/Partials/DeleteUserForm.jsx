@@ -51,7 +51,9 @@ export default function DeleteUserForm() {
                     Hapus Akun
                 </h2>
                 <p className="mt-1 text-sm text-light-brown">
-                    Setelah akun Anda dihapus, semua data akan dihapus secara permanen. Sebelum menghapus akun, harap unduh data atau informasi yang ingin Anda simpan.
+                    Setelah akun Anda dihapus, semua data akan dihapus secara
+                    permanen. Sebelum menghapus akun, harap unduh data atau
+                    informasi yang ingin Anda simpan.
                 </p>
             </header>
 
@@ -65,28 +67,43 @@ export default function DeleteUserForm() {
                         Apakah Anda yakin ingin menghapus akun?
                     </h2>
                     <p className="mt-2 text-sm text-light-brown">
-                        Setelah akun Anda dihapus, semua data akan dihapus secara permanen. Masukkan kata sandi Anda untuk mengonfirmasi.
+                        Setelah akun Anda dihapus, semua data akan dihapus
+                        secara permanen. Masukkan kata sandi Anda untuk
+                        mengonfirmasi.
                     </p>
 
                     <div className="mt-6">
-                        <InputLabel htmlFor="password" value="Kata Sandi" className="sr-only" />
+                        <InputLabel
+                            htmlFor="password"
+                            value="Kata Sandi"
+                            className="sr-only"
+                        />
                         <TextInput
                             id="password"
                             type="password"
                             name="password"
                             ref={passwordInput}
                             value={data.password}
-                            onChange={(e) => setData('password', e.target.value)}
+                            onChange={(e) =>
+                                setData('password', e.target.value)
+                            }
                             className="mt-1 block w-3/4"
                             isFocused
                             placeholder="Kata Sandi"
                         />
-                        <InputError message={errors.password} className="mt-2" />
+                        <InputError
+                            message={errors.password}
+                            className="mt-2"
+                        />
                     </div>
 
                     <div className="mt-6 flex justify-end gap-3">
-                        <SecondaryButton onClick={closeModal}>Batal</SecondaryButton>
-                        <DangerButton disabled={processing}>Hapus Akun</DangerButton>
+                        <SecondaryButton onClick={closeModal}>
+                            Batal
+                        </SecondaryButton>
+                        <DangerButton disabled={processing}>
+                            Hapus Akun
+                        </DangerButton>
                     </div>
                 </form>
             </Modal>

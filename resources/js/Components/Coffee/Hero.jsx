@@ -1,43 +1,60 @@
-import React from 'react';
+import { usePage } from '@inertiajs/react';
 
 export default function Hero() {
+    const { settings: globalSettings } = usePage().props;
+    const settings = globalSettings || {};
     return (
-        <section className="relative h-screen flex items-center justify-center overflow-hidden">
+        <section className="relative flex h-screen items-center justify-center overflow-hidden">
             {/* Background Image / Video */}
             <div className="absolute inset-0 z-0">
-                <img 
-                    src="/images/hero.png" 
-                    alt="Brewing Coffee" 
-                    className="w-full h-full object-cover scale-105 animate-slow-zoom"
+                <img
+                    src="/images/hero.png"
+                    alt="Brewing Coffee"
+                    className="animate-slow-zoom h-full w-full scale-105 object-cover"
                     onError={(e) => {
-                        e.target.src = 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&q=80&w=2070';
+                        e.target.src =
+                            'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&q=80&w=2070';
                     }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-espresso/90"></div>
             </div>
 
-            <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
-                <span className="text-gold uppercase tracking-[0.3em] text-sm md:text-base mb-6 block font-semibold animate-fade-in-up">Dibuat dengan Sepenuh Hati</span>
-                <h1 className="text-5xl md:text-8xl text-white mb-8 leading-tight animate-fade-in-up delay-100">
-                    Nikmati <br />
-                    <span className="italic font-light opacity-90">Kopi Terbaik</span>
+            <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
+                <span className="animate-fade-in-up mb-6 block text-sm font-semibold uppercase tracking-[0.3em] text-gold md:text-base">
+                    {settings.hero_subtitle || 'Dibuat dengan Sepenuh Hati'}
+                </span>
+                <h1 className="animate-fade-in-up mb-8 text-5xl leading-tight text-white delay-100 md:text-8xl">
+                    {settings.hero_title || 'Nikmati Kopi Terbaik'}
                 </h1>
-                <p className="text-white/80 text-lg md:text-xl mb-12 max-w-2xl mx-auto font-light leading-relaxed animate-fade-in-up delay-200">
-                    Kopi artisanal dari perkebunan organik paling berkelanjutan di dunia, disangrai setiap hari di jantung kota.
+                <p className="animate-fade-in-up mx-auto mb-12 max-w-2xl text-lg font-light leading-relaxed text-white/80 delay-200 md:text-xl">
+                    {settings.hero_description ||
+                        'Kopi artisanal dari perkebunan organik paling berkelanjutan di dunia, disangrai setiap hari di jantung kota.'}
                 </p>
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-6 animate-fade-in-up delay-300">
-                    <a href="#menu" className="btn-premium w-full sm:w-auto text-lg">Lihat Menu</a>
-                    <a href="#reservation" className="px-8 py-3 rounded-full border border-white/30 text-white hover:bg-white/10 transition-all duration-300 w-full sm:w-auto font-medium">Pesan Meja</a>
+                <div className="animate-fade-in-up flex flex-col items-center justify-center gap-6 delay-300 sm:flex-row">
+                    <a
+                        href="#menu"
+                        className="btn-premium w-full text-lg sm:w-auto"
+                    >
+                        Lihat Menu
+                    </a>
+                    <a
+                        href="#reservation"
+                        className="w-full rounded-full border border-white/30 px-8 py-3 font-medium text-white transition-all duration-300 hover:bg-white/10 sm:w-auto"
+                    >
+                        Pesan Meja
+                    </a>
                 </div>
             </div>
 
             <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
-                <div className="w-6 h-10 border-2 border-white/20 rounded-full flex justify-center pt-2">
-                    <div className="w-1 h-2 bg-gold rounded-full"></div>
+                <div className="flex h-10 w-6 justify-center rounded-full border-2 border-white/20 pt-2">
+                    <div className="h-2 w-1 rounded-full bg-gold"></div>
                 </div>
             </div>
 
-            <style dangerouslySetInnerHTML={{ __html: `
+            <style
+                dangerouslySetInnerHTML={{
+                    __html: `
                 @keyframes slow-zoom {
                     from { transform: scale(1); }
                     to { transform: scale(1.1); }
@@ -55,7 +72,9 @@ export default function Hero() {
                 .delay-100 { animation-delay: 0.1s; }
                 .delay-200 { animation-delay: 0.2s; }
                 .delay-300 { animation-delay: 0.3s; }
-            `}} />
+            `,
+                }}
+            />
         </section>
     );
 }

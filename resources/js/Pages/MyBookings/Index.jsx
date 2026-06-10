@@ -1,6 +1,6 @@
-import { Head, Link } from '@inertiajs/react';
-import Navbar from '@/Components/Coffee/Navbar';
 import Footer from '@/Components/Coffee/Footer';
+import Navbar from '@/Components/Coffee/Navbar';
+import { Head, Link } from '@inertiajs/react';
 
 export default function MyBookings({ auth, bookings }) {
     const statusLabel = (status) => {
@@ -25,34 +25,86 @@ export default function MyBookings({ auth, bookings }) {
         <>
             <Head title="Riwayat Booking" />
 
-            <div className="bg-cream min-h-screen">
+            <div className="min-h-screen bg-cream">
                 <Navbar auth={auth} alwaysShow={true} />
 
-                <main className="pt-32 pb-20">
-                    <div className="max-w-4xl mx-auto px-6">
-                        <h1 className="text-3xl font-bold text-espresso mb-3">Riwayat Booking</h1>
-                        <Link href="/" className="inline-flex items-center text-espresso/60 hover:text-gold transition-colors text-sm font-medium mb-8">&larr; Kembali</Link>
+                <main className="pb-20 pt-32">
+                    <div className="mx-auto max-w-4xl px-6">
+                        <h1 className="mb-3 text-3xl font-bold text-espresso">
+                            Riwayat Booking
+                        </h1>
+                        <Link
+                            href="/"
+                            className="mb-8 inline-flex items-center text-sm font-medium text-espresso/60 transition-colors hover:text-gold"
+                        >
+                            &larr; Kembali
+                        </Link>
 
                         {bookings.length === 0 ? (
-                            <div className="text-center py-20">
-                                <p className="text-espresso/40 italic mb-6">Anda belum memiliki reservasi.</p>
-                                <Link href="/#reservation" className="btn-premium">Booking Sekarang</Link>
+                            <div className="py-20 text-center">
+                                <p className="mb-6 italic text-espresso/40">
+                                    Anda belum memiliki reservasi.
+                                </p>
+                                <Link
+                                    href="/#reservation"
+                                    className="btn-premium"
+                                >
+                                    Booking Sekarang
+                                </Link>
                             </div>
                         ) : (
                             <div className="space-y-4">
-                                {bookings.map(booking => (
-                                    <div key={booking.id} className="bg-white rounded-2xl border border-gold/20 p-6 flex items-center justify-between">
+                                {bookings.map((booking) => (
+                                    <div
+                                        key={booking.id}
+                                        className="flex items-center justify-between rounded-2xl border border-gold/20 bg-white p-6"
+                                    >
                                         <div>
-                                            <p className="font-bold text-espresso text-lg">{booking.date}</p>
-                                            <p className="text-espresso/40 text-sm">{booking.start_time} - {booking.end_time} &middot; {booking.guests} tamu &middot; <span className="capitalize">{booking.table_type}</span></p>
-                                            {booking.notes && <p className="text-espresso/40 text-sm italic">"{booking.notes}"</p>}
+                                            <p className="text-lg font-bold text-espresso">
+                                                <span className="font-mono text-base font-bold text-gold">
+                                                    {booking.booking_number}
+                                                </span>
+                                            </p>
+                                            <p className="text-sm text-espresso/40">
+                                                {new Date(
+                                                    booking.date,
+                                                ).toLocaleDateString(
+                                                    'id-ID',
+                                                    {
+                                                        year: 'numeric',
+                                                        month: 'long',
+                                                        day: 'numeric',
+                                                    },
+                                                )}
+                                                {booking.start_time} -{' '}
+                                                {booking.end_time} &middot;{' '}
+                                                {booking.guests} tamu &middot;{' '}
+                                                <span className="capitalize">
+                                                    {booking.table_type}
+                                                </span>
+                                            </p>
+                                            {booking.notes && (
+                                                <p className="text-sm italic text-espresso/40">
+                                                    "{booking.notes}"
+                                                </p>
+                                            )}
                                             {booking.admin_notes && (
-                                                <p className="text-red-500/70 text-xs italic mt-1">Alasan ditolak: "{booking.admin_notes}"</p>
+                                                <p className="mt-1 text-xs italic text-red-500/70">
+                                                    Alasan ditolak: "
+                                                    {booking.admin_notes}"
+                                                </p>
                                             )}
                                         </div>
                                         <div className="flex items-center space-x-4">
-                                            <span className="text-gold font-bold">Rp {Number(booking.price).toLocaleString('id-ID')}</span>
-                                            <span className={`px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-widest ${statusClass(booking.status)}`}>
+                                            <span className="font-bold text-gold">
+                                                Rp{' '}
+                                                {Number(
+                                                    booking.price,
+                                                ).toLocaleString('id-ID')}
+                                            </span>
+                                            <span
+                                                className={`rounded-full px-4 py-1.5 text-sm font-bold uppercase tracking-widest ${statusClass(booking.status)}`}
+                                            >
                                                 {statusLabel(booking.status)}
                                             </span>
                                         </div>

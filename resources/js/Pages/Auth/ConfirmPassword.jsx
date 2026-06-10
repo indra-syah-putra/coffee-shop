@@ -23,7 +23,8 @@ export default function ConfirmPassword() {
             <Head title="Konfirmasi Kata Sandi" />
 
             <div className="mb-4 text-sm text-gray-600">
-                Ini adalah area aman aplikasi. Harap konfirmasi kata sandi Anda sebelum melanjutkan.
+                Ini adalah area aman aplikasi. Harap konfirmasi kata sandi Anda
+                sebelum melanjutkan.
             </div>
 
             <form onSubmit={submit}>
