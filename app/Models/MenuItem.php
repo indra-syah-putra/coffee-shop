@@ -6,7 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class MenuItem extends Model
 {
-    protected $fillable = ['name', 'price', 'category_id', 'image', 'description'];
+    protected $fillable = ['name', 'price', 'category_id', 'image', 'description', 'active'];
+
+    protected function casts(): array
+    {
+        return [
+            'active' => 'boolean',
+        ];
+    }
 
     public function category()
     {

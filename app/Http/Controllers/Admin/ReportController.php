@@ -19,6 +19,7 @@ class ReportController extends Controller
         $endDate = $request->get('end_date', Carbon::now()->format('Y-m-d'));
 
         $orders = Order::with(['items', 'user'])
+            ->whereIn('status', ['confirmed', 'completed'])
             ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
             ->orderBy('created_at', 'desc')
             ->get();
@@ -28,7 +29,7 @@ class ReportController extends Controller
         $totalDiscount = $orders->sum('discount');
 
         $itemSales = OrderItem::whereHas('order', function ($q) use ($startDate, $endDate) {
-            $q->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
+            $q->whereIn('status', ['confirmed', 'completed'])->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
         })->get()->groupBy('name')->map(function ($items) {
             return [
                 'name' => $items->first()->name,
@@ -59,7 +60,7 @@ class ReportController extends Controller
 
         // Category distribution (Pie chart)
         $categoryDistribution = OrderItem::whereHas('order', function ($q) use ($startDate, $endDate) {
-            $q->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
+            $q->whereIn('status', ['confirmed', 'completed'])->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
         })->with('menuItem.category')->get()->groupBy(function ($item) {
             return $item->menuItem?->category?->name ?? 'Tanpa Kategori';
         })->map(function ($items, $name) {
@@ -91,6 +92,7 @@ class ReportController extends Controller
         $endDate = $request->get('end_date', Carbon::now()->format('Y-m-d'));
 
         $orders = Order::with(['items', 'user'])
+            ->whereIn('status', ['confirmed', 'completed'])
             ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
             ->orderBy('created_at', 'desc')
             ->get();
@@ -134,6 +136,7 @@ class ReportController extends Controller
         $endDate = $request->get('end_date', Carbon::now()->format('Y-m-d'));
 
         $orders = Order::with(['items', 'user'])
+            ->whereIn('status', ['confirmed', 'completed'])
             ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
             ->orderBy('created_at', 'desc')
             ->get();
@@ -143,7 +146,7 @@ class ReportController extends Controller
         $totalDiscount = $orders->sum('discount');
 
         $itemSales = OrderItem::whereHas('order', function ($q) use ($startDate, $endDate) {
-            $q->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
+            $q->whereIn('status', ['confirmed', 'completed'])->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
         })->get()->groupBy('name')->map(function ($items) {
             return [
                 'name' => $items->first()->name,

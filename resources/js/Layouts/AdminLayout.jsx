@@ -168,7 +168,7 @@ const navItems = [
 ];
 
 export default function AdminLayout({ header, children }) {
-    const { auth, flash, url } = usePage().props;
+    const { auth, flash, url, adminNotifications } = usePage().props;
     const [showFlash, setShowFlash] = useState(false);
     const flashTimer = useRef(null);
 
@@ -348,6 +348,11 @@ export default function AdminLayout({ header, children }) {
                                                             child.route,
                                                             child.params,
                                                         );
+                                                        const badge = child.name === 'Pesanan'
+                                                            ? adminNotifications?.pendingOrders
+                                                            : child.name === 'Reservasi'
+                                                              ? adminNotifications?.pendingBookings
+                                                              : null;
                                                         return (
                                                             <Link
                                                                 key={
@@ -378,7 +383,12 @@ export default function AdminLayout({ header, children }) {
                                                                 <span className="text-sm">
                                                                     {child.name}
                                                                 </span>
-                                                                {active && (
+                                                                {badge > 0 && (
+                                                                    <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-xs font-bold text-white">
+                                                                        {badge}
+                                                                    </span>
+                                                                )}
+                                                                {active && !badge && (
                                                                     <span className="ml-auto h-1.5 w-1.5 rounded-full bg-gold" />
                                                                 )}
                                                             </Link>

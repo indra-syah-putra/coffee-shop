@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Booking;
+use App\Models\Order;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -24,8 +26,13 @@ class HandleInertiaRequests extends Middleware
             ],
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
+                'redirect_section' => fn () => $request->session()->get('redirect_section'),
             ],
             'settings' => Setting::all()->keyBy('key')->map->value,
+            'adminNotifications' => $request->user()?->is_admin ? [
+                'pendingOrders' => Order::where('status', 'pending')->count(),
+                'pendingBookings' => Booking::where('status', 'pending')->count(),
+            ] : null,
         ];
     }
 }

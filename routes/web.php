@@ -37,6 +37,7 @@ Route::get('/', function () {
         ->join('order_items', 'menu_items.id', '=', 'order_items.menu_item_id')
         ->join('orders', 'order_items.order_id', '=', 'orders.id')
         ->where('menu_items.active', true)
+        ->whereHas('category', fn($q) => $q->where('active', true))
         ->whereIn('orders.status', ['confirmed', 'processing', 'completed'])
         ->groupBy('menu_items.id')
         ->orderByDesc('total_orders')
@@ -46,7 +47,7 @@ Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
-        'menuItems' => MenuItem::with(['category', 'optionValues', 'toppings'])->where('active', true)->orderBy('name')->get(),
+        'menuItems' => MenuItem::with(['category', 'optionValues', 'toppings'])->where('active', true)->whereHas('category', fn($q) => $q->where('active', true))->orderBy('name')->get(),
         'categories' => Category::where('active', true)->orderBy('name')->pluck('name'),
         'promos' => Promo::active()->get(),
         'settings' => Setting::all()->keyBy('key')->map->value,

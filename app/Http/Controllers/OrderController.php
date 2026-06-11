@@ -101,12 +101,7 @@ class OrderController extends Controller
 
         $order->items()->createMany($orderItems);
 
-        $msg = 'Pesanan berhasil! Total: Rp ' . number_format($total - $discount, 0, ',', '.');
-        if ($discount > 0) {
-            $msg .= ' (Diskon: Rp ' . number_format($discount, 0, ',', '.') . ')';
-        }
-
-        return redirect()->route('my-orders')->with('success', $msg);
+        return redirect()->to('/')->with('success', 'Terimakasih, anda sudah melakukan pesanan.')->with('redirect_section', 'menu');
     }
 
     public function myOrders(Request $request)

@@ -13,10 +13,32 @@ function getCheckoutItems() {
     }
 }
 
+function groupItems(items) {
+    const groups = {};
+    for (const item of items) {
+        const vars = [
+            item.id,
+            item.size,
+            item.temperature,
+            item.sugar_level,
+            item.ice_level,
+            item.toppings ? JSON.stringify([...item.toppings].sort()) : '',
+        ];
+        const key = vars.filter(Boolean).join('::');
+        if (groups[key]) {
+            groups[key].quantity += item.quantity;
+        } else {
+            groups[key] = { ...item };
+        }
+    }
+    return Object.values(groups);
+}
+
 export default function Checkout({ auth, promos }) {
     const { removeItem, makeKey } = useCart();
     const [processing, setProcessing] = useState(false);
-    const [items] = useState(getCheckoutItems);
+    const [rawItems] = useState(getCheckoutItems);
+    const items = groupItems(rawItems);
     const [selectedPromo, setSelectedPromo] = useState('');
 
     const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
@@ -149,10 +171,7 @@ export default function Checkout({ auth, promos }) {
                                                     </p>
                                                 )}
                                                 <p className="text-sm text-espresso/40">
-                                                    {item.quantity} x Rp{' '}
-                                                    {Number(
-                                                        item.price,
-                                                    ).toLocaleString('id-ID')}
+                                                    x{item.quantity}
                                                 </p>
                                             </div>
                                         </div>

@@ -176,9 +176,19 @@ export default function Cart({ auth }) {
                                                         >
                                                             -
                                                         </button>
-                                                        <span className="min-w-[2.5rem] border-x border-gold/20 px-3 py-1.5 text-center text-sm font-bold text-espresso">
-                                                            {item.quantity}
-                                                        </span>
+                                                        <input
+                                                            type="number"
+                                                            min="1"
+                                                            value={item.quantity}
+                                                            onChange={(e) => {
+                                                                const val = parseInt(e.target.value, 10);
+                                                                if (!isNaN(val) && val >= 1) updateQuantity(key, val);
+                                                            }}
+                                                            onBlur={(e) => {
+                                                                if (!e.target.value || parseInt(e.target.value, 10) < 1) updateQuantity(key, 1);
+                                                            }}
+                                                            className="w-10 border-x border-gold/20 px-1 py-1.5 text-center text-sm font-bold text-espresso outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                                                        />
                                                         <button
                                                             onClick={() =>
                                                                 updateQuantity(

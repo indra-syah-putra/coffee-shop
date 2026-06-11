@@ -11,13 +11,27 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'date' => 'required|date|after:today',
+            'date' => 'required|date|after_or_equal:today',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i',
             'guests' => 'required|integer|min:1|max:20',
             'table_type' => 'required|in:indoor,outdoor,balkon',
             'notes' => 'nullable|string|max:500',
         ]);
+
+        $now = now()->timezone('Asia/Jakarta');
+        $bookingDate = \Carbon\Carbon::parse($validated['date'])->timezone('Asia/Jakarta');
+
+        if ($bookingDate->isToday()) {
+            $startTime = \Carbon\Carbon::parse($validated['start_time'])->timezone('Asia/Jakarta');
+            $minStartTime = $now->copy()->addHours(2);
+
+            if ($startTime->lt($minStartTime)) {
+                return back()->withErrors([
+                    'start_time' => 'Jam mulai untuk hari ini harus minimal 2 jam dari sekarang (' . $minStartTime->format('H:i') . ' WIB).',
+                ])->withInput();
+            }
+        }
 
         $start = strtotime($validated['start_time']);
         $end = strtotime($validated['end_time']);
@@ -52,7 +66,7 @@ class BookingController extends Controller
             abort(403);
         }
 
-        return redirect()->route('my-bookings')->with('success', 'Pembayaran berhasil! Menunggu konfirmasi admin.');
+        return redirect()->to('/')->with('success', 'Terimakasih, reservasi anda berhasil.')->with('redirect_section', 'reservation');
     }
 
     public function myBookings(Request $request)

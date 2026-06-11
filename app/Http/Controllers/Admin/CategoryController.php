@@ -20,28 +20,28 @@ class CategoryController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:categories,name',
-            'active' => 'nullable|in:0,1,true,false',
+            'active' => 'nullable|boolean',
         ]);
 
-        $validated['active'] = filter_var($validated['active'] ?? true, FILTER_VALIDATE_BOOLEAN);
+        $validated['active'] = $validated['active'] ?? true;
 
         Category::create($validated);
 
-        return redirect()->back()->with('success', 'Category created.');
+        return redirect()->back()->with('success', 'Kategori berhasil ditambahkan.');
     }
 
     public function update(Request $request, Category $category)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
-            'active' => 'nullable|in:0,1,true,false',
+            'active' => 'nullable|boolean',
         ]);
 
-        $validated['active'] = filter_var($validated['active'] ?? true, FILTER_VALIDATE_BOOLEAN);
+        $validated['active'] = $validated['active'] ?? true;
 
         $category->update($validated);
 
-        return redirect()->back()->with('success', 'Category updated.');
+        return redirect()->back()->with('success', 'Kategori berhasil diperbarui.');
     }
 
     public function destroy(Category $category)

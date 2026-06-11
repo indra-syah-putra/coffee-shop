@@ -4,8 +4,24 @@ import MenuSection from '@/Components/Coffee/MenuSection';
 import Navbar from '@/Components/Coffee/Navbar';
 import PopularSection from '@/Components/Coffee/PopularSection';
 import StorySection from '@/Components/Coffee/StorySection';
-import { Head, router, useForm } from '@inertiajs/react';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 export default function Welcome({ auth, menuItems, categories, settings, popularItems }) {
+    const { flash } = usePage().props;
+    const [toast, setToast] = useState(null);
+
+    useEffect(() => {
+        if (flash?.success) {
+            setToast(flash.success);
+            if (flash.redirect_section) {
+                setTimeout(() => {
+                    document.getElementById(flash.redirect_section)?.scrollIntoView({ behavior: 'smooth' });
+                }, 300);
+            }
+            const timer = setTimeout(() => setToast(null), 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [flash]);
     const {
         data: bookingData,
         setData: setBooking,
@@ -36,6 +52,33 @@ export default function Welcome({ auth, menuItems, categories, settings, popular
         return Math.ceil(hours / 6) * 15000;
     };
 
+    const addHours = (time, hours) => {
+        if (!time) return '';
+        const [h, m] = time.split(':').map(Number);
+        const d = new Date();
+        d.setHours(h + hours, m, 0, 0);
+        return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    };
+
+    const handleDateChange = (value) => {
+        setBooking('date', value);
+        const today = new Date().toLocaleDateString('en-CA');
+        if (value === today) {
+            const now = new Date();
+            now.setHours(now.getHours() + 2);
+            const hh = String(now.getHours()).padStart(2, '0');
+            const mm = String(now.getMinutes()).padStart(2, '0');
+            const start = `${hh}:${mm}`;
+            setBooking('start_time', start);
+            setBooking('end_time', addHours(start, 3));
+        }
+    };
+
+    const handleStartTimeChange = (value) => {
+        setBooking('start_time', value);
+        setBooking('end_time', addHours(value, 3));
+    };
+
     const submitBooking = (e) => {
         e.preventDefault();
         if (!auth.user) {
@@ -50,12 +93,27 @@ export default function Welcome({ auth, menuItems, categories, settings, popular
             <Head title="Kafein | Kopi Artisanal Premium" />
 
             <div className="min-h-screen bg-cream">
+                {toast && (
+                    <div className="fixed bottom-6 right-6 z-50 animate-fade-in-up">
+                        <div className="flex items-center space-x-3 rounded-2xl border border-green-200 bg-white px-6 py-4 shadow-lg shadow-green-900/10">
+                            <svg className="h-6 w-6 shrink-0 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <p className="text-sm font-medium text-espresso">{toast}</p>
+                            <button onClick={() => setToast(null)} className="ml-4 text-espresso/30 hover:text-espresso">
+                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                )}
                 <Navbar auth={auth} />
 
                 <main>
                     <Hero />
 
-                    <PopularSection items={popularItems} />
+                    <PopularSection items={popularItems} auth={auth} />
 
                     {/* Promo Section (only for guests) */}
                     {!auth?.user && (
@@ -131,7 +189,7 @@ export default function Welcome({ auth, menuItems, categories, settings, popular
                                         type="date"
                                         value={bookingData.date}
                                         onChange={(e) =>
-                                            setBooking('date', e.target.value)
+                                            handleDateChange(e.target.value)
                                         }
                                         className="rounded-lg border border-light-brown/20 bg-light-brown/10 p-4 focus:ring-2 focus:ring-gold"
                                         required
@@ -145,8 +203,7 @@ export default function Welcome({ auth, menuItems, categories, settings, popular
                                         type="time"
                                         value={bookingData.start_time}
                                         onChange={(e) =>
-                                            setBooking(
-                                                'start_time',
+                                            handleStartTimeChange(
                                                 e.target.value,
                                             )
                                         }

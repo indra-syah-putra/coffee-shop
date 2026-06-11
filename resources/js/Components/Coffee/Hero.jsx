@@ -46,11 +46,17 @@ export default function Hero() {
                 </div>
             </div>
 
-            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
+            <button
+                onClick={() => {
+                    document.getElementById('popular')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce cursor-pointer"
+                aria-label="Scroll ke Pilihan Terbaik"
+            >
                 <div className="flex h-10 w-6 justify-center rounded-full border-2 border-white/20 pt-2">
                     <div className="h-2 w-1 rounded-full bg-gold"></div>
                 </div>
-            </div>
+            </button>
 
             <style
                 dangerouslySetInnerHTML={{

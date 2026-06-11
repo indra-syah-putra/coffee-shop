@@ -1,11 +1,12 @@
-import { Link } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
+import MenuItemModal from './MenuItemModal';
 
 const rankEmojis = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
 
-export default function PopularSection({ items = [] }) {
+export default function PopularSection({ items = [], auth }) {
     const [current, setCurrent] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
+    const [modalItem, setModalItem] = useState(null);
     const timer = useRef(null);
 
     const total = items.length;
@@ -35,7 +36,7 @@ export default function PopularSection({ items = [] }) {
     const item = items[current];
 
     return (
-        <section className="relative overflow-hidden bg-gradient-to-br from-espresso via-espresso/95 to-espresso/90 py-20">
+        <section id="popular" className="relative overflow-hidden bg-gradient-to-br from-espresso via-espresso/95 to-espresso/90 py-20">
             <div className="absolute right-[-100px] top-[-100px] h-[300px] w-[300px] rounded-full bg-gold/5 blur-3xl"></div>
             <div className="absolute bottom-[-50px] left-[-50px] h-[200px] w-[200px] rounded-full bg-gold/5 blur-3xl"></div>
 
@@ -115,12 +116,12 @@ export default function PopularSection({ items = [] }) {
                                             'id-ID',
                                         )}
                                     </span>
-                                    <Link
-                                        href="#menu"
+                                    <button
+                                        onClick={() => setModalItem(item)}
                                         className="rounded-full bg-gold/20 px-5 py-2 text-sm font-semibold text-gold transition-all duration-300 hover:bg-gold hover:text-espresso"
                                     >
                                         Pesan Sekarang →
-                                    </Link>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -143,6 +144,14 @@ export default function PopularSection({ items = [] }) {
                     </div>
                 </div>
             </div>
+
+            {modalItem && (
+                <MenuItemModal
+                    item={modalItem}
+                    auth={auth}
+                    onClose={() => setModalItem(null)}
+                />
+            )}
         </section>
     );
 }

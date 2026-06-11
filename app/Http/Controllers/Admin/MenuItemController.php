@@ -34,6 +34,7 @@ class MenuItemController extends Controller
             'description' => 'nullable|string',
             'option_values' => 'nullable|array',
             'option_values.*' => 'exists:menu_option_values,id',
+            'active' => 'nullable|boolean',
         ]);
 
         $item = new MenuItem;
@@ -41,6 +42,7 @@ class MenuItemController extends Controller
         $item->price = $validated['price'];
         $item->category_id = $validated['category_id'];
         $item->description = $validated['description'] ?? null;
+        $item->active = $validated['active'] ?? true;
 
         if ($request->hasFile('image')) {
             $item->image = $request->file('image')->store('menus', 'public');
@@ -63,6 +65,7 @@ class MenuItemController extends Controller
             'description' => 'nullable|string',
             'option_values' => 'nullable|array',
             'option_values.*' => 'exists:menu_option_values,id',
+            'active' => 'nullable|boolean',
         ]);
 
         if (isset($validated['name'])) {
@@ -76,6 +79,10 @@ class MenuItemController extends Controller
         }
         if (array_key_exists('description', $validated)) {
             $menuItem->description = $validated['description'];
+        }
+
+        if (array_key_exists('active', $validated)) {
+            $menuItem->active = $validated['active'];
         }
 
         if ($request->hasFile('image')) {

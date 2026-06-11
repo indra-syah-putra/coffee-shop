@@ -1,5 +1,5 @@
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
 const inputClass =
@@ -53,6 +53,7 @@ export default function MenuItems({
         category_id: '',
         image: '',
         description: '',
+        active: true,
         option_values: [],
         option_prices: {},
     });
@@ -134,10 +135,24 @@ export default function MenuItems({
             category_id: item.category_id ?? '',
             image: null,
             description: item.description ?? '',
+            active: item.active,
             option_values: (item.option_values || []).map((ov) => ov.id),
             option_prices: prices,
         });
         setPreview(item.image ? `/storage/${item.image}` : null);
+    };
+
+    const toggleActive = (item) => {
+        const form = new FormData();
+        form.append('active', item.active ? '0' : '1');
+        form.append('_method', 'PUT');
+        router.post(route('admin.menu-items.update', item.id), {
+            active: !item.active,
+            _method: 'PUT',
+        }, {
+            preserveScroll: true,
+            preserveState: false,
+        });
     };
 
     const optionLabel = (type) => {
@@ -352,6 +367,20 @@ export default function MenuItems({
                                 )}
                             </div>
 
+                            <div className="flex items-center space-x-2.5 border-t border-gold/10 pt-4">
+                                <input
+                                    type="checkbox"
+                                    checked={data.active}
+                                    onChange={(e) =>
+                                        setData('active', e.target.checked)
+                                    }
+                                    className="h-4 w-4 cursor-pointer rounded border-gold/30 text-gold focus:ring-gold"
+                                />
+                                <span className="text-sm text-espresso/70">
+                                    Aktif
+                                </span>
+                            </div>
+
                             {/* Variasi Options */}
                             {[
                                 sizeOptions,
@@ -483,6 +512,17 @@ export default function MenuItems({
                                                         {item.category?.name ||
                                                             'Tanpa Kategori'}
                                                     </span>
+                                                    <span
+                                                        className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                                                            item.active !== false
+                                                                ? 'bg-emerald-100 text-emerald-700'
+                                                                : 'bg-gray-100 text-gray-500'
+                                                        }`}
+                                                    >
+                                                        {item.active !== false
+                                                            ? 'Aktif'
+                                                            : 'Nonaktif'}
+                                                    </span>
                                                 </div>
                                                 {item.option_values?.length >
                                                     0 && (
@@ -506,6 +546,30 @@ export default function MenuItems({
                                             </div>
                                         </div>
                                         <div className="flex items-center space-x-2">
+                                            <button
+                                                onClick={() => toggleActive(item)}
+                                                className={`rounded-lg p-2 transition-colors ${
+                                                    item.active !== false
+                                                        ? 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                                                        : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
+                                                }`}
+                                                title={
+                                                    item.active !== false
+                                                        ? 'Nonaktifkan'
+                                                        : 'Aktifkan'
+                                                }
+                                            >
+                                                {item.active !== false ? (
+                                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    </svg>
+                                                ) : (
+                                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                )}
+                                            </button>
                                             <button
                                                 onClick={() => editItem(item)}
                                                 className="rounded-lg bg-amber-50 p-2 text-amber-600 transition-colors hover:bg-amber-100"
