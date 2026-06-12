@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Order extends Model
 {
     use SoftDeletes;
-{
     protected $fillable = ['user_id', 'order_number', 'total', 'status', 'promo_id', 'discount'];
 
     protected function casts(): array

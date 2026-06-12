@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Promo extends Model
 {
     use SoftDeletes;
-{
     protected $fillable = [
         'name', 'description', 'discount_type', 'discount_value',
         'start_date', 'end_date', 'active',

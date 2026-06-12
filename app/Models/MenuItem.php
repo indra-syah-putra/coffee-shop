@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class MenuItem extends Model
 {
     use SoftDeletes;
-{
     protected $fillable = ['name', 'price', 'category_id', 'image', 'description', 'active'];
 
     protected function casts(): array

@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class MenuOptionValue extends Model
 {
     use SoftDeletes;
-{
     protected $fillable = ['type', 'name', 'active'];
 
     protected function casts(): array
