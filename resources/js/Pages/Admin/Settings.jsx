@@ -212,7 +212,7 @@ export default function Settings({ settings }) {
                 </h2>
             }
         >
-            <Head title="Admin | Settings" />
+            <Head title="Admin | Pengaturan" />
 
             <div className="grid min-h-0 flex-1 grid-cols-1 gap-8 lg:grid-cols-4">
                 <div className="lg:col-span-1">
@@ -258,9 +258,10 @@ export default function Settings({ settings }) {
                         <form onSubmit={submit} className="space-y-5">
                             {subGroups[activeGroup]
                                 ? subGroups[activeGroup].map((sub) => {
-                                      const subSettings = currentSettings.filter(
-                                          (s) => sub.keys.includes(s.key),
-                                      );
+                                      const subSettings =
+                                          currentSettings.filter((s) =>
+                                              sub.keys.includes(s.key),
+                                          );
                                       return (
                                           <div
                                               key={sub.label}
@@ -278,7 +279,9 @@ export default function Settings({ settings }) {
                                                                       labelClass
                                                                   }
                                                               >
-                                                                  {setting.label}
+                                                                  {
+                                                                      setting.label
+                                                                  }
                                                               </label>
                                                               {setting.type ===
                                                               'textarea' ? (
@@ -311,7 +314,9 @@ export default function Settings({ settings }) {
                                                                   <div>
                                                                       <div className="flex items-center space-x-3">
                                                                           <label className="cursor-pointer rounded-xl bg-gold px-4 py-2 text-sm font-bold text-espresso transition-all hover:bg-gold-light">
-                                                                              + Tambah Gambar
+                                                                              +
+                                                                              Tambah
+                                                                              Gambar
                                                                               <input
                                                                                   type="file"
                                                                                   accept="image/*"
@@ -365,13 +370,15 @@ export default function Settings({ settings }) {
                                                                                                   className="group relative overflow-hidden rounded-xl border border-gold/10"
                                                                                               >
                                                                                                   <img
-                                                                                                      src={`/storage/${img}`}
-                                                                                                      alt={`Gambar ${idx + 1}`}
-                                                                                                      className="h-32 w-full object-cover"
-                                                                                                  />
-                                                                                                  <div className="absolute inset-0 flex items-center justify-center space-x-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
-                                                                                                      {idx >
-                                                                                                          0 && (
+                                                                                                       src={`/storage/${img}`}
+                                                                                                       alt={`Gambar ${idx + 1}`}
+                                                                                                       loading="lazy"
+                                                                                                       onError={(e) => { e.target.style.display = 'none' }}
+                                                                                                       className="h-32 w-full object-cover"
+                                                                                                   />
+                                                                                                   <div className="absolute inset-0 flex items-center justify-center space-x-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+                                                                                                       {idx >
+                                                                                                           0 && (
                                                                                                           <button
                                                                                                               type="button"
                                                                                                               onClick={() =>
@@ -522,16 +529,18 @@ export default function Settings({ settings }) {
                                                                           }}
                                                                           className={`${inputClass} file:mr-3 file:rounded-lg file:border-0 file:bg-gold file:px-4 file:py-2 file:text-sm file:font-bold file:text-espresso hover:file:bg-gold-light`}
                                                                       />
-                                                                      {setting.value && (
-                                                                          <img
-                                                                              src={`/storage/${setting.value}`}
-                                                                              alt={
-                                                                                  setting.label
-                                                                              }
-                                                                              className="mt-3 h-36 w-48 rounded-xl border border-gold/10 object-cover"
-                                                                          />
-                                                                      )}
-                                                                  </div>
+                                                                       {setting.value && (
+                                                                            <img
+                                                                                src={`/storage/${setting.value}`}
+                                                                                alt={
+                                                                                    setting.label
+                                                                                }
+                                                                                loading="lazy"
+                                                                                onError={(e) => { e.target.style.display = 'none' }}
+                                                                                className="mt-3 h-36 w-48 rounded-xl border border-gold/10 object-cover"
+                                                                            />
+                                                                       )}
+                                                                   </div>
                                                               ) : (
                                                                   <input
                                                                       type="text"
@@ -658,14 +667,16 @@ export default function Settings({ settings }) {
                                                                               }
                                                                               className="group relative overflow-hidden rounded-xl border border-gold/10"
                                                                           >
-                                                                              <img
-                                                                                  src={`/storage/${img}`}
-                                                                                  alt={`Gambar ${idx + 1}`}
-                                                                                  className="h-32 w-full object-cover"
-                                                                              />
-                                                                              <div className="absolute inset-0 flex items-center justify-center space-x-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
-                                                                                  {idx >
-                                                                                      0 && (
+<img
+                                                                                   src={`/storage/${img}`}
+                                                                                   alt={`Gambar ${idx + 1}`}
+                                                                                   loading="lazy"
+                                                                                   onError={(e) => { e.target.style.display = 'none' }}
+                                                                                   className="h-32 w-full object-cover"
+                                                                               />
+                                                                               <div className="absolute inset-0 flex items-center justify-center space-x-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+                                                                                   {idx >
+                                                                                       0 && (
                                                                                       <button
                                                                                           type="button"
                                                                                           onClick={() =>
@@ -809,14 +820,16 @@ export default function Settings({ settings }) {
                                                       }}
                                                       className={`${inputClass} file:mr-3 file:rounded-lg file:border-0 file:bg-gold file:px-4 file:py-2 file:text-sm file:font-bold file:text-espresso hover:file:bg-gold-light`}
                                                   />
-                                                  {setting.value && (
-                                                      <img
-                                                          src={`/storage/${setting.value}`}
-                                                          alt={setting.label}
-                                                          className="mt-3 h-36 w-48 rounded-xl border border-gold/10 object-cover"
-                                                      />
-                                                  )}
-                                              </div>
+                                                   {setting.value && (
+                                                       <img
+                                                           src={`/storage/${setting.value}`}
+                                                           alt={setting.label}
+                                                           loading="lazy"
+                                                           onError={(e) => { e.target.style.display = 'none' }}
+                                                           className="mt-3 h-36 w-48 rounded-xl border border-gold/10 object-cover"
+                                                       />
+                                                   )}
+                                               </div>
                                           ) : (
                                               <input
                                                   type="text"
@@ -835,9 +848,7 @@ export default function Settings({ settings }) {
                                               />
                                           )}
 
-                                          {errors[
-                                              `settings.${setting.id}`
-                                          ] && (
+                                          {errors[`settings.${setting.id}`] && (
                                               <p className="mt-1.5 flex items-center space-x-1 text-xs text-red-500">
                                                   <span>⚠</span>
                                                   <span>

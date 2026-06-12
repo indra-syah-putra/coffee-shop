@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\AdminController;
@@ -87,6 +88,13 @@ Route::middleware('auth')->group(function () {
     // Orders
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::get('/my-orders', [OrderController::class, 'myOrders'])->name('my-orders');
+
+    // Cart API
+    Route::get('/cart/items', [CartController::class, 'index'])->name('cart.items');
+    Route::post('/cart/items', [CartController::class, 'store'])->name('cart.items.store');
+    Route::put('/cart/items/{cartItem}', [CartController::class, 'update'])->name('cart.items.update');
+    Route::delete('/cart/items/{cartItem}', [CartController::class, 'destroy'])->name('cart.items.destroy');
+    Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 });
 
 // Admin dashboard

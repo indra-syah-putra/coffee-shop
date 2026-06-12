@@ -56,6 +56,7 @@ export default function MenuItems({
         active: true,
         option_values: [],
         option_prices: {},
+        option_defaults: [],
     });
 
     const toggleOption = (id) => {
@@ -65,14 +66,39 @@ export default function MenuItems({
             ? current.filter((v) => v !== id)
             : [...current, id];
         const newPrices = { ...data.option_prices };
+        const newDefaults = [...(data.option_defaults || [])];
         if (isSelected) {
             delete newPrices[id];
+            const idx = newDefaults.indexOf(id);
+            if (idx !== -1) newDefaults.splice(idx, 1);
         }
         setData({
             ...data,
             option_values: newOptionValues,
             option_prices: newPrices,
+            option_defaults: newDefaults,
         });
+    };
+
+    const getOptionType = (id) => {
+        if (sizeOptions.some((o) => o.id === id)) return 'size';
+        if (temperatureOptions.some((o) => o.id === id)) return 'temperature';
+        if (sugarLevelOptions.some((o) => o.id === id)) return 'sugar_level';
+        return null;
+    };
+
+    const toggleDefault = (id) => {
+        const current = data.option_defaults || [];
+        if (current.includes(id)) {
+            setData('option_defaults', current.filter((v) => v !== id));
+            return;
+        }
+        const type = getOptionType(id);
+        const allOptions = [...sizeOptions, ...temperatureOptions, ...sugarLevelOptions];
+        const sameTypeIds = allOptions.filter((o) => o.type === type).map((o) => o.id);
+        const newDefaults = current.filter((v) => !sameTypeIds.includes(v));
+        newDefaults.push(id);
+        setData('option_defaults', newDefaults);
     };
 
     const setOptionPrice = (id, value) => {
@@ -88,6 +114,7 @@ export default function MenuItems({
             description: '',
             option_values: [],
             option_prices: {},
+            option_defaults: [],
         });
         setPreview(null);
         setEditing(null);
@@ -105,12 +132,15 @@ export default function MenuItems({
             option_prices: prices,
             ...(editing ? { _method: 'PUT' } : {}),
         }));
-        post(editing
-            ? route('admin.menu-items.update', editing)
-            : route('admin.menu-items.store'), {
-            onSuccess: () => resetForm(),
-            preserveScroll: true,
-        });
+        post(
+            editing
+                ? route('admin.menu-items.update', editing)
+                : route('admin.menu-items.store'),
+            {
+                onSuccess: () => resetForm(),
+                preserveScroll: true,
+            },
+        );
     };
 
     const handleImage = (e) => {
@@ -123,9 +153,13 @@ export default function MenuItems({
 
     const editItem = (item) => {
         const prices = {};
+        const defaults = [];
         (item.option_values || []).forEach((ov) => {
             if (ov.pivot?.price) {
                 prices[ov.id] = String(Math.round(Number(ov.pivot.price)));
+            }
+            if (ov.pivot?.is_default) {
+                defaults.push(ov.id);
             }
         });
         setEditing(item.id);
@@ -138,6 +172,7 @@ export default function MenuItems({
             active: item.active,
             option_values: (item.option_values || []).map((ov) => ov.id),
             option_prices: prices,
+            option_defaults: defaults,
         });
         setPreview(item.image ? `/storage/${item.image}` : null);
     };
@@ -146,13 +181,17 @@ export default function MenuItems({
         const form = new FormData();
         form.append('active', item.active ? '0' : '1');
         form.append('_method', 'PUT');
-        router.post(route('admin.menu-items.update', item.id), {
-            active: !item.active,
-            _method: 'PUT',
-        }, {
-            preserveScroll: true,
-            preserveState: false,
-        });
+        router.post(
+            route('admin.menu-items.update', item.id),
+            {
+                active: !item.active,
+                _method: 'PUT',
+            },
+            {
+                preserveScroll: true,
+                preserveState: false,
+            },
+        );
     };
 
     const optionLabel = (type) => {
@@ -176,13 +215,55 @@ export default function MenuItems({
                         const selected = (data.option_values || []).includes(
                             opt.id,
                         );
+                        const isDefault = (data.option_defaults || []).includes(
+                            opt.id,
+                        );
                         return (
                             <div key={opt.id} className="flex flex-col gap-1">
-                                <div
-                                    onClick={() => toggleOption(opt.id)}
-                                    className={chipClass(selected)}
-                                >
-                                    {opt.name}
+                                <div className="flex items-center gap-1">
+                                    <div
+                                        onClick={() => toggleOption(opt.id)}
+                                        className={chipClass(selected)}
+                                    >
+                                        {opt.name}
+                                    </div>
+                                    {selected && (
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                toggleDefault(opt.id);
+                                            }}
+                                            className={`rounded-lg p-1 transition-colors ${
+                                                isDefault
+                                                    ? 'text-amber-500'
+                                                    : 'text-espresso/20 hover:text-amber-300'
+                                            }`}
+                                            title={
+                                                isDefault
+                                                    ? 'Default'
+                                                    : 'Set sebagai default'
+                                            }
+                                        >
+                                            <svg
+                                                className="h-4 w-4"
+                                                fill={
+                                                    isDefault
+                                                        ? 'currentColor'
+                                                        : 'none'
+                                                }
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth="2"
+                                                    d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+                                                />
+                                            </svg>
+                                        </button>
+                                    )}
                                 </div>
                                 {selected && hasPrice(type) && (
                                     <input
@@ -218,7 +299,7 @@ export default function MenuItems({
                 </h2>
             }
         >
-            <Head title="Admin | Menu Items" />
+            <Head title="Admin | Menu" />
 
             <div className="grid min-h-0 flex-1 grid-cols-1 gap-8 lg:grid-cols-3">
                 {/* Form */}
@@ -338,6 +419,8 @@ export default function MenuItems({
                                     <img
                                         src={preview}
                                         alt="Preview"
+                                        loading="lazy"
+                                        onError={(e) => { e.target.style.display = 'none' }}
                                         className="mt-2 h-32 w-32 rounded-xl border border-gold/10 object-cover"
                                     />
                                 )}
@@ -514,7 +597,8 @@ export default function MenuItems({
                                                     </span>
                                                     <span
                                                         className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                                                            item.active !== false
+                                                            item.active !==
+                                                            false
                                                                 ? 'bg-emerald-100 text-emerald-700'
                                                                 : 'bg-gray-100 text-gray-500'
                                                         }`}
@@ -547,7 +631,9 @@ export default function MenuItems({
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <button
-                                                onClick={() => toggleActive(item)}
+                                                onClick={() =>
+                                                    toggleActive(item)
+                                                }
                                                 className={`rounded-lg p-2 transition-colors ${
                                                     item.active !== false
                                                         ? 'bg-gray-100 text-gray-500 hover:bg-gray-200'
@@ -560,13 +646,38 @@ export default function MenuItems({
                                                 }
                                             >
                                                 {item.active !== false ? (
-                                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <svg
+                                                        className="h-4 w-4"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        viewBox="0 0 24 24"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            strokeWidth="2"
+                                                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                                                        />
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            strokeWidth="2"
+                                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                                        />
                                                     </svg>
                                                 ) : (
-                                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    <svg
+                                                        className="h-4 w-4"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        viewBox="0 0 24 24"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            strokeWidth="2"
+                                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                        />
                                                     </svg>
                                                 )}
                                             </button>

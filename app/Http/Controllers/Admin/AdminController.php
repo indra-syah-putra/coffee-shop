@@ -36,7 +36,7 @@ class AdminController extends Controller
         $user->fill($data);
         $user->save();
 
-        return Redirect::route('admin.profile');
+        return Redirect::route('admin.profile')->with('success', 'Profile berhasil diperbarui.');
     }
 
     public function dashboard()

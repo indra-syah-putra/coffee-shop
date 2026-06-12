@@ -47,11 +47,11 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         if ($category->menuItems()->count() > 0) {
-            return redirect()->back()->with('error', 'Cannot delete category with existing menu items.');
+            return redirect()->back()->with('error', 'Tidak dapat menghapus kategori yang masih memiliki menu.');
         }
 
         $category->delete();
 
-        return redirect()->back()->with('success', 'Category deleted.');
+        return redirect()->back()->with('success', 'Kategori berhasil dihapus.');
     }
 }

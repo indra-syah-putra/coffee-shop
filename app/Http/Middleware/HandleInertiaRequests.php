@@ -26,6 +26,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
+                'error' => fn () => $request->session()->get('error'),
                 'redirect_section' => fn () => $request->session()->get('redirect_section'),
             ],
             'settings' => Setting::all()->keyBy('key')->map->value,

@@ -3,7 +3,7 @@ import { Head, Link } from '@inertiajs/react';
 
 const statCards = [
     {
-        label: 'Menu Items',
+        label: 'Menu',
         value: 'totalMenuItems',
         color: 'from-amber-500 to-yellow-500',
         icon: (

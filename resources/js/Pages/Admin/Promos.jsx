@@ -74,7 +74,7 @@ export default function Promos({ promos }) {
                 </h2>
             }
         >
-            <Head title="Admin | Promos" />
+            <Head title="Admin | Promo" />
 
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                 <div className="lg:col-span-1">

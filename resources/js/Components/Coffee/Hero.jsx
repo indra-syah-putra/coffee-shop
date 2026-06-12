@@ -48,7 +48,9 @@ export default function Hero() {
 
             <button
                 onClick={() => {
-                    document.getElementById('popular')?.scrollIntoView({ behavior: 'smooth' });
+                    document
+                        .getElementById('popular')
+                        ?.scrollIntoView({ behavior: 'smooth' });
                 }}
                 className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce cursor-pointer"
                 aria-label="Scroll ke Pilihan Terbaik"

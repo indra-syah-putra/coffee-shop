@@ -30,13 +30,13 @@ class BookingController extends Controller
             'cancelled' => 'dibatalkan',
             default => $validated['status'],
         };
-        return redirect()->back()->with('success', "Booking {$label}.");
+        return redirect()->back()->with('success', "Booking berhasil {$label}.");
     }
 
     public function destroy(Booking $booking)
     {
         $booking->delete();
 
-        return redirect()->back()->with('success', 'Booking deleted.');
+        return redirect()->back()->with('success', 'Booking berhasil dihapus.');
     }
 }

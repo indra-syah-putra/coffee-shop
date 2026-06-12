@@ -85,7 +85,7 @@ export default function MenuOptions({ sizes, temperatures, sugarLevels }) {
                 </h2>
             }
         >
-            <Head title="Admin | Menu Options" />
+            <Head title="Admin | Opsi Menu" />
 
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                 <div className="lg:col-span-1">

@@ -3,8 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MenuItem extends Model
+{
+    use SoftDeletes;
 {
     protected $fillable = ['name', 'price', 'category_id', 'image', 'description', 'active'];
 
@@ -23,7 +26,7 @@ class MenuItem extends Model
     public function optionValues()
     {
         return $this->belongsToMany(MenuOptionValue::class, 'menu_item_option')
-            ->withPivot('price')
+            ->withPivot('price', 'is_default')
             ->withTimestamps();
     }
 

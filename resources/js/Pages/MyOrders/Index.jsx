@@ -97,7 +97,8 @@ export default function MyOrders({ auth, orders }) {
                                                         {order.order_number}
                                                     </span>
                                                     <span className="font-normal text-espresso/20">
-                                                        {' '}|{' '}
+                                                        {' '}
+                                                        |{' '}
                                                     </span>
                                                     <span className="text-base font-normal text-espresso/40">
                                                         {new Date(
@@ -108,18 +109,22 @@ export default function MyOrders({ auth, orders }) {
                                                                 year: 'numeric',
                                                                 month: 'long',
                                                                 day: 'numeric',
-                                                                timeZone: 'Asia/Jakarta',
+                                                                timeZone:
+                                                                    'Asia/Jakarta',
                                                             },
-                                                        ) + ' • ' + new Date(
-                                                            order.created_at,
-                                                        ).toLocaleTimeString(
-                                                            'id-ID',
-                                                            {
-                                                                hour: '2-digit',
-                                                                minute: '2-digit',
-                                                                timeZone: 'Asia/Jakarta',
-                                                            },
-                                                        )}
+                                                        ) +
+                                                            ' • ' +
+                                                            new Date(
+                                                                order.created_at,
+                                                            ).toLocaleTimeString(
+                                                                'id-ID',
+                                                                {
+                                                                    hour: '2-digit',
+                                                                    minute: '2-digit',
+                                                                    timeZone:
+                                                                        'Asia/Jakarta',
+                                                                },
+                                                            )}
                                                     </span>
                                                 </p>
                                             </div>

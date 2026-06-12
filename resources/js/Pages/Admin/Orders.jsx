@@ -1,5 +1,5 @@
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Head, usePage, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
 const statusStyles = {
@@ -51,6 +51,7 @@ export default function AdminOrders({ orders: initialOrders }) {
     }, [initialOrders]);
 
     const updateStatus = (id, status) => {
+        const prevOrders = orders;
         setOrders((prev) =>
             prev.map((o) => (o.id === id ? { ...o, status } : o)),
         );
@@ -62,6 +63,7 @@ export default function AdminOrders({ orders: initialOrders }) {
                 preserveState: true,
                 replace: true,
                 onFinish: () => setChanging(null),
+                onError: () => setOrders(prevOrders),
             },
         );
     };
@@ -83,7 +85,7 @@ export default function AdminOrders({ orders: initialOrders }) {
                 </h2>
             }
         >
-            <Head title="Admin | Orders" />
+            <Head title="Admin | Pesanan" />
 
             <div className="rounded-2xl border border-gold/10 bg-white p-6 shadow-sm">
                 <div className="mb-6 flex items-center justify-between">
@@ -172,18 +174,22 @@ export default function AdminOrders({ orders: initialOrders }) {
                                                             year: 'numeric',
                                                             month: 'long',
                                                             day: 'numeric',
-                                                            timeZone: 'Asia/Jakarta',
+                                                            timeZone:
+                                                                'Asia/Jakarta',
                                                         },
-                                                    ) + ' • ' + new Date(
-                                                        order.created_at,
-                                                    ).toLocaleTimeString(
-                                                        'id-ID',
-                                                        {
-                                                            hour: '2-digit',
-                                                            minute: '2-digit',
-                                                            timeZone: 'Asia/Jakarta',
-                                                        },
-                                                    )}
+                                                    ) +
+                                                        ' • ' +
+                                                        new Date(
+                                                            order.created_at,
+                                                        ).toLocaleTimeString(
+                                                            'id-ID',
+                                                            {
+                                                                hour: '2-digit',
+                                                                minute: '2-digit',
+                                                                timeZone:
+                                                                    'Asia/Jakarta',
+                                                            },
+                                                        )}
                                                 </span>
                                             </div>
                                             <div className="mt-2 flex items-center space-x-3">
@@ -259,51 +265,63 @@ export default function AdminOrders({ orders: initialOrders }) {
                                         </div>
                                     </div>
                                     <div className="ml-4 flex shrink-0 items-center space-x-2">
-                                        {['confirmed', 'cancelled'].includes(order.status) ? (
+                                        {['confirmed', 'cancelled'].includes(
+                                            order.status,
+                                        ) ? (
                                             <span className="inline-flex items-center rounded-full border border-gold/20 bg-white/50 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-espresso/40">
-                                                <svg className="mr-1.5 h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                                <svg
+                                                    className="mr-1.5 h-3.5 w-3.5"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth="2"
+                                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                                                    />
                                                 </svg>
-                                                Final
+                                                Selesai
                                             </span>
                                         ) : (
-                                        <select
-                                            value={selected[order.id] || ''}
-                                            onChange={(e) =>
-                                                updateStatus(
-                                                    order.id,
-                                                    e.target.value,
-                                                )
-                                            }
-                                            disabled={changing === order.id}
-                                            className="min-w-[8rem] rounded-lg border border-gold/10 bg-white p-2 text-sm focus:ring-2 focus:ring-gold"
-                                        >
-                                            <option value="" disabled>
-                                                Ubah Status
-                                            </option>
-                                            {order.status === 'pending' && (
-                                                <>
-                                                    <option value="processing">
-                                                        Diproses
-                                                    </option>
-                                                    <option value="cancelled">
-                                                        Dibatalkan
-                                                    </option>
-                                                </>
-                                            )}
-                                            {order.status === 'processing' && (
-                                                <>
-                                                    <option value="confirmed">
-                                                        Dikonfirmasi
-                                                    </option>
-                                                    <option value="cancelled">
-                                                        Dibatalkan
-                                                    </option>
-                                                </>
-                                            )}
-                                        </select>
+                                            <select
+                                                value={selected[order.id] || ''}
+                                                onChange={(e) =>
+                                                    updateStatus(
+                                                        order.id,
+                                                        e.target.value,
+                                                    )
+                                                }
+                                                disabled={changing === order.id}
+                                                className="min-w-[8rem] rounded-lg border border-gold/10 bg-white p-2 text-sm focus:ring-2 focus:ring-gold"
+                                            >
+                                                <option value="" disabled>
+                                                    Ubah Status
+                                                </option>
+                                                {order.status === 'pending' && (
+                                                    <>
+                                                        <option value="processing">
+                                                            Diproses
+                                                        </option>
+                                                        <option value="cancelled">
+                                                            Dibatalkan
+                                                        </option>
+                                                    </>
+                                                )}
+                                                {order.status ===
+                                                    'processing' && (
+                                                    <>
+                                                        <option value="confirmed">
+                                                            Dikonfirmasi
+                                                        </option>
+                                                        <option value="cancelled">
+                                                            Dibatalkan
+                                                        </option>
+                                                    </>
+                                                )}
+                                            </select>
                                         )}
-
                                     </div>
                                 </div>
                             </div>

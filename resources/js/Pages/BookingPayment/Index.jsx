@@ -50,14 +50,11 @@ export default function BookingPayment({ auth, booking }) {
                                     <span className="font-semibold text-espresso">
                                         {new Date(
                                             booking.date,
-                                        ).toLocaleDateString(
-                                            'id-ID',
-                                            {
-                                                year: 'numeric',
-                                                month: 'long',
-                                                day: 'numeric',
-                                            },
-                                        )}
+                                        ).toLocaleDateString('id-ID', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric',
+                                        })}
                                     </span>
                                 </div>
                                 <div className="flex justify-between border-b border-espresso/5 py-2">

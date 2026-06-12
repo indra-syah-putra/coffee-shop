@@ -70,7 +70,7 @@ export default function Categories({ categories }) {
                 </div>
             }
         >
-            <Head title="Admin | Categories" />
+            <Head title="Admin | Kategori" />
 
             <div className="grid min-h-0 flex-1 grid-cols-1 gap-8 lg:grid-cols-3">
                 <div className="min-h-0 lg:col-span-1">

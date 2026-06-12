@@ -68,14 +68,11 @@ export default function MyBookings({ auth, bookings }) {
                                             <p className="text-sm text-espresso/40">
                                                 {new Date(
                                                     booking.date,
-                                                ).toLocaleDateString(
-                                                    'id-ID',
-                                                    {
-                                                        year: 'numeric',
-                                                        month: 'long',
-                                                        day: 'numeric',
-                                                    },
-                                                )}
+                                                ).toLocaleDateString('id-ID', {
+                                                    year: 'numeric',
+                                                    month: 'long',
+                                                    day: 'numeric',
+                                                })}
                                                 {booking.start_time} -{' '}
                                                 {booking.end_time} &middot;{' '}
                                                 {booking.guests} tamu &middot;{' '}

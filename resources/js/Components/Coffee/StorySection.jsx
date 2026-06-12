@@ -45,6 +45,8 @@ export default function StorySection({ settings = {} }) {
                                         key={idx}
                                         src={`/storage/${img}`}
                                         alt={`Cerita Kami ${idx + 1}`}
+                                        loading="lazy"
+                                        onError={(e) => { e.target.style.display = 'none' }}
                                         className={`absolute inset-0 h-full w-full object-cover transition-all duration-700 ${
                                             idx === currentIndex
                                                 ? 'scale-100 opacity-100'
@@ -114,12 +116,16 @@ export default function StorySection({ settings = {} }) {
                             <img
                                 src={`/storage/${singleImage}`}
                                 alt="Cerita Kami"
+                                loading="lazy"
+                                onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&q=80&w=1000' }}
                                 className="aspect-square w-full object-cover"
                             />
                         ) : (
                             <img
                                 src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&q=80&w=1000"
                                 alt="Coffee"
+                                loading="lazy"
+                                onError={(e) => { e.target.style.display = 'none' }}
                                 className="aspect-square w-full object-cover"
                             />
                         )}

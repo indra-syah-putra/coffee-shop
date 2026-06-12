@@ -25,6 +25,8 @@ export default function AdminProfile() {
                             <img
                                 src={user.photo_url}
                                 alt={user.name}
+                                loading="lazy"
+                                onError={(e) => { e.target.style.display = 'none' }}
                                 className="h-full w-full object-cover"
                             />
                         ) : (

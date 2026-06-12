@@ -4,10 +4,22 @@ import { useState } from 'react';
 
 export default function MenuItemModal({ item, onClose, auth }) {
     const { addItem } = useCart();
-    const [size, setSize] = useState(null);
-    const [temperature, setTemperature] = useState(null);
-    const [iceLevel, setIceLevel] = useState(null);
-    const [sugarLevel, setSugarLevel] = useState(null);
+
+    const getDefaultForType = (type) => {
+        const opt = (item.option_values || []).find(
+            (ov) => ov.type === type && ov.pivot?.is_default,
+        );
+        return opt?.id || null;
+    };
+
+    const [size, setSize] = useState(getDefaultForType('size'));
+    const [temperature, setTemperature] = useState(
+        getDefaultForType('temperature'),
+    );
+    const [iceLevel, setIceLevel] = useState(getDefaultForType('ice_level'));
+    const [sugarLevel, setSugarLevel] = useState(
+        getDefaultForType('sugar_level'),
+    );
     const [toppings, setToppings] = useState([]);
     const [qty, setQty] = useState(1);
 
@@ -86,16 +98,14 @@ export default function MenuItemModal({ item, onClose, auth }) {
         onClose();
     };
 
-    const handleBuyNow = () => {
+    const handleBuyNow = async () => {
         const unitPrice = getUnitPrice();
-        const items = [];
         for (let i = 0; i < qty; i++) {
-            items.push({
+            await addItem({
                 id: item.id,
                 name: getDisplayName(),
                 price: unitPrice,
                 image: item.image,
-                quantity: 1,
                 size: sizes.find((s) => s.id === size)?.name || null,
                 temperature:
                     temperatures.find((t) => t.id === temperature)?.name ||
@@ -107,7 +117,6 @@ export default function MenuItemModal({ item, onClose, auth }) {
                 toppings,
             });
         }
-        localStorage.setItem('checkoutItems', JSON.stringify(items));
         router.get(route('checkout'));
     };
 
@@ -172,6 +181,8 @@ export default function MenuItemModal({ item, onClose, auth }) {
                         <img
                             src={`/storage/${item.image}`}
                             alt={item.name}
+                            loading="lazy"
+                            onError={(e) => { e.target.style.display = 'none' }}
                             className="h-full w-full object-cover"
                         />
                     ) : (
@@ -196,25 +207,27 @@ export default function MenuItemModal({ item, onClose, auth }) {
                         <div>
                             {groupLabel('Pilih Ukuran')}
                             <div className="flex flex-wrap gap-2">
-                                {sizes.map((s) => (
-                                    <button
-                                        key={s.id}
-                                        onClick={() => setSize(s.id)}
-                                        className={chipClass(size === s.id)}
-                                    >
-                                        {s.name}
-                                        {s.pivot?.price ? (
-                                            <span className="ml-1.5 opacity-60">
-                                                +Rp{' '}
-                                                {Number(
-                                                    s.pivot.price,
-                                                ).toLocaleString('id-ID')}
-                                            </span>
-                                        ) : (
-                                            ''
-                                        )}
-                                    </button>
-                                ))}
+                                    {sizes.map((s) => (
+                                        <button
+                                            key={s.id}
+                                            onClick={() => setSize(s.id)}
+                                            className={chipClass(
+                                                size === s.id,
+                                            )}
+                                        >
+                                            {s.name}
+                                            {s.pivot?.price ? (
+                                                <span className="ml-1.5 opacity-60">
+                                                    +Rp{' '}
+                                                    {Number(
+                                                        s.pivot.price,
+                                                    ).toLocaleString('id-ID')}
+                                                </span>
+                                            ) : (
+                                                ''
+                                            )}
+                                        </button>
+                                    ))}
                             </div>
                         </div>
                     )}
@@ -230,14 +243,24 @@ export default function MenuItemModal({ item, onClose, auth }) {
                                         onClick={() => {
                                             setTemperature(t.id);
                                             if (t.name === 'Dingin') {
-                                                const defaultIce =
-                                                    iceLevels.find(
-                                                        (i) =>
-                                                            i.name ===
-                                                            'Es Biasa',
+                                                const iceDefault =
+                                                    getDefaultForType(
+                                                        'ice_level',
                                                     );
-                                                if (defaultIce)
-                                                    setIceLevel(defaultIce.id);
+                                                if (iceDefault) {
+                                                    setIceLevel(iceDefault);
+                                                } else {
+                                                    const fallbackIce =
+                                                        iceLevels.find(
+                                                            (i) =>
+                                                                i.name ===
+                                                                'Es Biasa',
+                                                        );
+                                                    if (fallbackIce)
+                                                        setIceLevel(
+                                                            fallbackIce.id,
+                                                        );
+                                                }
                                             } else {
                                                 setIceLevel(null);
                                             }
@@ -302,12 +325,12 @@ export default function MenuItemModal({ item, onClose, auth }) {
                                     <button
                                         key={s.id}
                                         onClick={() => setSugarLevel(s.id)}
-                                        className={chipClass(
-                                            sugarLevel === s.id,
-                                        )}
-                                    >
-                                        {s.name}
-                                    </button>
+                                                className={chipClass(
+                                                    sugarLevel === s.id,
+                                                )}
+                                            >
+                                                {s.name}
+                                            </button>
                                 ))}
                             </div>
                         </div>

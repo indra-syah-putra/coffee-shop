@@ -107,7 +107,7 @@ export default function Reports({
                 </h2>
             }
         >
-            <Head title="Admin | Reports" />
+            <Head title="Admin | Laporan" />
 
             <div className="space-y-6">
                 {/* Filter */}

@@ -52,7 +52,7 @@ class MenuItemController extends Controller
 
         $this->syncOptionValues($item, $request);
 
-        return redirect()->back()->with('success', 'Menu item created.');
+        return redirect()->back()->with('success', 'Menu berhasil ditambahkan.');
     }
 
     public function update(Request $request, MenuItem $menuItem)
@@ -98,7 +98,7 @@ class MenuItemController extends Controller
             $this->syncOptionValues($menuItem, $request);
         }
 
-        return redirect()->back()->with('success', 'Menu item updated.');
+        return redirect()->back()->with('success', 'Menu berhasil diperbarui.');
     }
 
     public function destroy(MenuItem $menuItem)
@@ -109,7 +109,7 @@ class MenuItemController extends Controller
         $menuItem->optionValues()->detach();
         $menuItem->delete();
 
-        return redirect()->back()->with('success', 'Menu item deleted.');
+        return redirect()->back()->with('success', 'Menu berhasil dihapus.');
     }
 
     public function storeTopping(Request $request, MenuItem $menuItem)
@@ -121,7 +121,7 @@ class MenuItemController extends Controller
 
         $menuItem->toppings()->create($validated);
 
-        return redirect()->back()->with('success', 'Topping added.');
+        return redirect()->back()->with('success', 'Topping berhasil ditambahkan.');
     }
 
     public function updateTopping(Request $request, MenuItemTopping $topping)
@@ -133,26 +133,32 @@ class MenuItemController extends Controller
 
         $topping->update($validated);
 
-        return redirect()->back()->with('success', 'Topping updated.');
+        return redirect()->back()->with('success', 'Topping berhasil diperbarui.');
     }
 
     public function destroyTopping(MenuItemTopping $topping)
     {
         $topping->delete();
 
-        return redirect()->back()->with('success', 'Topping deleted.');
+        return redirect()->back()->with('success', 'Topping berhasil dihapus.');
     }
 
     protected function syncOptionValues($item, $request)
     {
         $optionValues = $request->input('option_values', []);
         $optionPrices = $request->input('option_prices', []);
+        $optionDefaults = $request->input('option_defaults', []);
 
         $syncData = [];
         foreach ($optionValues as $ovId) {
-            $syncData[$ovId] = isset($optionPrices[$ovId]) && $optionPrices[$ovId] !== ''
-                ? ['price' => $optionPrices[$ovId]]
-                : [];
+            $data = [];
+            if (isset($optionPrices[$ovId]) && $optionPrices[$ovId] !== '') {
+                $data['price'] = $optionPrices[$ovId];
+            } else {
+                $data['price'] = null;
+            }
+            $data['is_default'] = in_array($ovId, $optionDefaults);
+            $syncData[$ovId] = $data;
         }
 
         // Auto-attach ice_level options when Dingin temperature is selected
@@ -161,7 +167,7 @@ class MenuItemController extends Controller
             $iceLevels = MenuOptionValue::where('type', 'ice_level')->pluck('id')->toArray();
             foreach ($iceLevels as $ilId) {
                 if (!isset($syncData[$ilId])) {
-                    $syncData[$ilId] = [];
+                    $syncData[$ilId] = ['is_default' => false];
                 }
             }
         }

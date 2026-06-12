@@ -30,7 +30,7 @@ class MenuOptionValueController extends Controller
 
         MenuOptionValue::create($validated);
 
-        return redirect()->back()->with('success', 'Option created.');
+        return redirect()->back()->with('success', 'Opsi berhasil ditambahkan.');
     }
 
     public function update(Request $request, MenuOptionValue $menuOptionValue)
@@ -44,7 +44,7 @@ class MenuOptionValueController extends Controller
 
         $menuOptionValue->update($validated);
 
-        return redirect()->back()->with('success', 'Option updated.');
+        return redirect()->back()->with('success', 'Opsi berhasil diperbarui.');
     }
 
     public function destroy(MenuOptionValue $menuOptionValue)
@@ -52,6 +52,6 @@ class MenuOptionValueController extends Controller
         $menuOptionValue->menuItems()->detach();
         $menuOptionValue->delete();
 
-        return redirect()->back()->with('success', 'Option deleted.');
+        return redirect()->back()->with('success', 'Opsi berhasil dihapus.');
     }
 }

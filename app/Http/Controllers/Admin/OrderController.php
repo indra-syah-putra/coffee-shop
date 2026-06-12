@@ -64,13 +64,13 @@ class OrderController extends Controller
 
         $order->update($validated);
 
-        return redirect()->back()->with('success', 'Order status updated.');
+        return redirect()->back()->with('success', 'Status pesanan berhasil diperbarui.');
     }
 
     public function destroy(Order $order)
     {
         $order->delete();
 
-        return redirect()->back()->with('success', 'Order deleted.');
+        return redirect()->back()->with('success', 'Pesanan berhasil dihapus.');
     }
 }

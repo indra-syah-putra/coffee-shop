@@ -6,7 +6,21 @@ import PopularSection from '@/Components/Coffee/PopularSection';
 import StorySection from '@/Components/Coffee/StorySection';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
-export default function Welcome({ auth, menuItems, categories, settings, popularItems }) {
+export default function Welcome({
+    auth,
+    menuItems,
+    categories,
+    settings,
+    popularItems,
+}) {
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (!document.hidden) {
+                router.reload({ only: ['menuItems', 'popularItems', 'promos'] });
+            }
+        }, 30000);
+        return () => clearInterval(interval);
+    }, []);
     const { flash } = usePage().props;
     const [toast, setToast] = useState(null);
 
@@ -15,7 +29,9 @@ export default function Welcome({ auth, menuItems, categories, settings, popular
             setToast(flash.success);
             if (flash.redirect_section) {
                 setTimeout(() => {
-                    document.getElementById(flash.redirect_section)?.scrollIntoView({ behavior: 'smooth' });
+                    document
+                        .getElementById(flash.redirect_section)
+                        ?.scrollIntoView({ behavior: 'smooth' });
                 }, 300);
             }
             const timer = setTimeout(() => setToast(null), 5000);
@@ -94,15 +110,40 @@ export default function Welcome({ auth, menuItems, categories, settings, popular
 
             <div className="min-h-screen bg-cream">
                 {toast && (
-                    <div className="fixed bottom-6 right-6 z-50 animate-fade-in-up">
+                    <div className="animate-fade-in-up fixed bottom-6 right-6 z-50">
                         <div className="flex items-center space-x-3 rounded-2xl border border-green-200 bg-white px-6 py-4 shadow-lg shadow-green-900/10">
-                            <svg className="h-6 w-6 shrink-0 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            <svg
+                                className="h-6 w-6 shrink-0 text-green-500"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
                             </svg>
-                            <p className="text-sm font-medium text-espresso">{toast}</p>
-                            <button onClick={() => setToast(null)} className="ml-4 text-espresso/30 hover:text-espresso">
-                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            <p className="text-sm font-medium text-espresso">
+                                {toast}
+                            </p>
+                            <button
+                                onClick={() => setToast(null)}
+                                className="ml-4 text-espresso/30 hover:text-espresso"
+                            >
+                                <svg
+                                    className="h-4 w-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M6 18L18 6M6 6l12 12"
+                                    />
                                 </svg>
                             </button>
                         </div>

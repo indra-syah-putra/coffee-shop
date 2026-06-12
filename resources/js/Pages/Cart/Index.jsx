@@ -114,7 +114,9 @@ export default function Cart({ auth }) {
                                                                 : `/storage/${item.image}`
                                                         }
                                                         alt={item.name}
-                                                        className="h-16 w-16 shrink-0 rounded-xl object-cover"
+                                                        loading="lazy"
+                                                        onError={(e) => { e.target.style.display = 'none' }}
+                                                        className="h-12 w-12 rounded-lg object-cover"
                                                     />
                                                 )}
                                                 <div className="min-w-0 flex-1">
@@ -179,13 +181,41 @@ export default function Cart({ auth }) {
                                                         <input
                                                             type="number"
                                                             min="1"
-                                                            value={item.quantity}
+                                                            value={
+                                                                item.quantity
+                                                            }
                                                             onChange={(e) => {
-                                                                const val = parseInt(e.target.value, 10);
-                                                                if (!isNaN(val) && val >= 1) updateQuantity(key, val);
+                                                                const val =
+                                                                    parseInt(
+                                                                        e.target
+                                                                            .value,
+                                                                        10,
+                                                                    );
+                                                                if (
+                                                                    !isNaN(
+                                                                        val,
+                                                                    ) &&
+                                                                    val >= 1
+                                                                )
+                                                                    updateQuantity(
+                                                                        key,
+                                                                        val,
+                                                                    );
                                                             }}
                                                             onBlur={(e) => {
-                                                                if (!e.target.value || parseInt(e.target.value, 10) < 1) updateQuantity(key, 1);
+                                                                if (
+                                                                    !e.target
+                                                                        .value ||
+                                                                    parseInt(
+                                                                        e.target
+                                                                            .value,
+                                                                        10,
+                                                                    ) < 1
+                                                                )
+                                                                    updateQuantity(
+                                                                        key,
+                                                                        1,
+                                                                    );
                                                             }}
                                                             className="w-10 border-x border-gold/20 px-1 py-1.5 text-center text-sm font-bold text-espresso outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                                                         />

@@ -64,6 +64,8 @@ export default function UpdateProfileInformation({
                                 <img
                                     src={preview}
                                     alt="Preview"
+                                    loading="lazy"
+                                    onError={(e) => { e.target.style.display = 'none' }}
                                     className="h-full w-full object-cover"
                                 />
                             ) : (

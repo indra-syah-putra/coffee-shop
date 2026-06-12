@@ -1,3 +1,4 @@
+import { router } from '@inertiajs/react';
 import {
     createContext,
     useCallback,
@@ -6,75 +7,108 @@ import {
     useState,
 } from 'react';
 
-function makeKey(item) {
-    const vars = [
-        item.id,
-        item.size,
-        item.temperature,
-        item.sugar_level,
-        item.ice_level,
-        item.toppings ? JSON.stringify([...item.toppings].sort()) : '',
-    ];
-    return vars.filter(Boolean).join('::');
-}
-
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
-    const [items, setItems] = useState(() => {
+    const [items, setItems] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    const makeKey = (item) => {
+        const vars = [
+            item.id,
+            item.size,
+            item.temperature,
+            item.sugar_level,
+            item.ice_level,
+            item.toppings
+                ? JSON.stringify([...item.toppings].sort())
+                : '',
+        ];
+        return vars.filter(Boolean).join('::');
+    };
+
+    const fetchCart = useCallback(async () => {
         try {
-            const saved = localStorage.getItem('cart');
-            return saved ? JSON.parse(saved) : [];
+            setLoading(true);
+            const res = await window.axios.get(route('cart.items'));
+            setItems(res.data.items || []);
         } catch {
-            return [];
+            setItems([]);
+        } finally {
+            setLoading(false);
         }
-    });
+    }, []);
 
     useEffect(() => {
-        localStorage.setItem('cart', JSON.stringify(items));
-    }, [items]);
+        fetchCart();
+        router.on('success', fetchCart);
+        return () => router.off('success', fetchCart);
+    }, [fetchCart]);
 
-    const addItem = useCallback((item) => {
-        setItems((prev) => {
-            const key = makeKey(item);
-            const existing = prev.find((i) => makeKey(i) === key);
-            if (existing) {
-                return prev.map((i) =>
-                    makeKey(i) === key ? { ...i, quantity: i.quantity + 1 } : i,
-                );
+    const addItem = useCallback(
+        async (item) => {
+            try {
+                    await window.axios.post(route('cart.items.store'), {
+                        id: item.id,
+                        name: item.name,
+                        price: item.price,
+                        image: item.image || null,
+                        size: item.size || null,
+                        temperature: item.temperature || null,
+                        sugar_level: item.sugar_level || null,
+                        ice_level: item.ice_level || null,
+                        toppings: item.toppings || [],
+                    });
+                await fetchCart();
+            } catch {
+                //
             }
-            return [
-                ...prev,
-                {
-                    id: item.id,
-                    name: item.name,
-                    price: item.price,
-                    image: item.image,
-                    size: item.size || null,
-                    temperature: item.temperature || null,
-                    sugar_level: item.sugar_level || null,
-                    ice_level: item.ice_level || null,
-                    toppings: item.toppings || [],
-                    quantity: 1,
-                },
-            ];
-        });
-    }, []);
+        },
+        [fetchCart],
+    );
 
-    const removeItem = useCallback((key) => {
-        setItems((prev) => prev.filter((i) => makeKey(i) !== key));
-    }, []);
+    const removeItem = useCallback(
+        async (key) => {
+            const item = items.find((i) => makeKey(i) === key);
+            if (!item) return;
+            try {
+                await window.axios.delete(
+                    route('cart.items.destroy', item.cart_item_id),
+                );
+                await fetchCart();
+            } catch {
+                //
+            }
+        },
+        [items, fetchCart],
+    );
 
-    const updateQuantity = useCallback((key, qty) => {
-        if (qty < 1) return;
-        setItems((prev) =>
-            prev.map((i) => (makeKey(i) === key ? { ...i, quantity: qty } : i)),
-        );
-    }, []);
+    const updateQuantity = useCallback(
+        async (key, qty) => {
+            if (qty < 1) return;
+            const item = items.find((i) => makeKey(i) === key);
+            if (!item) return;
+            try {
+                await window.axios.put(
+                    route('cart.items.update', item.cart_item_id),
+                    { quantity: qty },
+                );
+                await fetchCart();
+            } catch {
+                //
+            }
+        },
+        [items, fetchCart],
+    );
 
-    const clearCart = useCallback(() => {
-        setItems([]);
-    }, []);
+    const clearCart = useCallback(async () => {
+        try {
+            await window.axios.delete(route('cart.clear'));
+            await fetchCart();
+        } catch {
+            //
+        }
+    }, [fetchCart]);
 
     const cartCount = items.reduce((sum, i) => sum + i.quantity, 0);
     const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
@@ -90,6 +124,7 @@ export function CartProvider({ children }) {
                 cartCount,
                 total,
                 makeKey,
+                loading,
             }}
         >
             {children}

@@ -2,44 +2,34 @@ import Footer from '@/Components/Coffee/Footer';
 import Navbar from '@/Components/Coffee/Navbar';
 import { useCart } from '@/Contexts/CartContext';
 import { Head, Link, router } from '@inertiajs/react';
-import { useState } from 'react';
-
-function getCheckoutItems() {
-    try {
-        const saved = localStorage.getItem('checkoutItems');
-        return saved ? JSON.parse(saved) : [];
-    } catch {
-        return [];
-    }
-}
-
-function groupItems(items) {
-    const groups = {};
-    for (const item of items) {
-        const vars = [
-            item.id,
-            item.size,
-            item.temperature,
-            item.sugar_level,
-            item.ice_level,
-            item.toppings ? JSON.stringify([...item.toppings].sort()) : '',
-        ];
-        const key = vars.filter(Boolean).join('::');
-        if (groups[key]) {
-            groups[key].quantity += item.quantity;
-        } else {
-            groups[key] = { ...item };
-        }
-    }
-    return Object.values(groups);
-}
+import { useEffect, useState } from 'react';
 
 export default function Checkout({ auth, promos }) {
-    const { removeItem, makeKey } = useCart();
+    const { items: cartItems, removeItem, makeKey, clearCart } = useCart();
     const [processing, setProcessing] = useState(false);
-    const [rawItems] = useState(getCheckoutItems);
-    const items = groupItems(rawItems);
+    const [items, setItems] = useState([]);
     const [selectedPromo, setSelectedPromo] = useState('');
+
+    useEffect(() => {
+        const saved = (() => {
+            try {
+                const s = localStorage.getItem('checkoutItems');
+                return s ? JSON.parse(s) : [];
+            } catch { return []; }
+        })();
+        if (saved.length > 0) {
+            const groups = {};
+            for (const item of saved) {
+                const vars = [item.id, item.size, item.temperature, item.sugar_level, item.ice_level, item.toppings ? JSON.stringify([...item.toppings].sort()) : ''];
+                const key = vars.filter(Boolean).join('::');
+                if (groups[key]) groups[key].quantity += item.quantity;
+                else groups[key] = { ...item };
+            }
+            setItems(Object.values(groups));
+        } else if (cartItems.length > 0) {
+            setItems(cartItems);
+        }
+    }, [cartItems]);
 
     const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
@@ -93,7 +83,7 @@ export default function Checkout({ auth, promos }) {
             },
             {
                 onSuccess: () => {
-                    items.forEach((i) => removeItem(makeKey(i)));
+                    clearCart();
                     localStorage.removeItem('checkoutItems');
                 },
                 onFinish: () => setProcessing(false),
@@ -158,6 +148,8 @@ export default function Checkout({ auth, promos }) {
                                                             : `/storage/${item.image}`
                                                     }
                                                     alt={item.name}
+                                                    loading="lazy"
+                                                    onError={(e) => { e.target.style.display = 'none' }}
                                                     className="h-12 w-12 rounded-lg object-cover"
                                                 />
                                             )}

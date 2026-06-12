@@ -75,6 +75,6 @@ class PromoController extends Controller
     {
         $promo->delete();
 
-        return redirect()->back()->with('success', 'Promo deleted.');
+        return redirect()->back()->with('success', 'Promo berhasil dihapus.');
     }
 }

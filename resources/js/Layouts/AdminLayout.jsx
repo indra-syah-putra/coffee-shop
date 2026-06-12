@@ -173,13 +173,13 @@ export default function AdminLayout({ header, children }) {
     const flashTimer = useRef(null);
 
     useEffect(() => {
-        if (flash?.success) {
+        if (flash?.success || flash?.error) {
             setShowFlash(true);
             clearTimeout(flashTimer.current);
             flashTimer.current = setTimeout(() => setShowFlash(false), 4000);
         }
         return () => clearTimeout(flashTimer.current);
-    }, [flash?.success]);
+    }, [flash?.success, flash?.error]);
     const user = auth.user;
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [expandedMenus, setExpandedMenus] = useState([
@@ -348,11 +348,14 @@ export default function AdminLayout({ header, children }) {
                                                             child.route,
                                                             child.params,
                                                         );
-                                                        const badge = child.name === 'Pesanan'
-                                                            ? adminNotifications?.pendingOrders
-                                                            : child.name === 'Reservasi'
-                                                              ? adminNotifications?.pendingBookings
-                                                              : null;
+                                                        const badge =
+                                                            child.name ===
+                                                            'Pesanan'
+                                                                ? adminNotifications?.pendingOrders
+                                                                : child.name ===
+                                                                    'Reservasi'
+                                                                  ? adminNotifications?.pendingBookings
+                                                                  : null;
                                                         return (
                                                             <Link
                                                                 key={
@@ -388,9 +391,10 @@ export default function AdminLayout({ header, children }) {
                                                                         {badge}
                                                                     </span>
                                                                 )}
-                                                                {active && !badge && (
-                                                                    <span className="ml-auto h-1.5 w-1.5 rounded-full bg-gold" />
-                                                                )}
+                                                                {active &&
+                                                                    !badge && (
+                                                                        <span className="ml-auto h-1.5 w-1.5 rounded-full bg-gold" />
+                                                                    )}
                                                             </Link>
                                                         );
                                                     },
@@ -543,28 +547,51 @@ export default function AdminLayout({ header, children }) {
                 </header>
 
                 {/* Flash Message */}
-                {showFlash && flash?.success && (
-                    <div className="mx-6 mt-4 flex items-center space-x-3 rounded-xl border border-green-200 bg-green-50 px-6 py-4 text-sm font-medium text-green-700 transition-opacity duration-500">
+                {showFlash && (flash?.success || flash?.error) && (
+                    <div className={`fixed bottom-4 right-4 z-50 flex items-center space-x-3 rounded-xl border px-6 py-4 text-sm font-medium shadow-lg transition-all duration-500 ${
+                        flash?.error
+                            ? 'border-red-200 bg-red-50 text-red-700'
+                            : 'border-green-200 bg-green-50 text-green-700'
+                    }`}>
                         <svg
-                            className="h-5 w-5 shrink-0 text-green-500"
+                            className={`h-5 w-5 shrink-0 ${flash?.error ? 'text-red-500' : 'text-green-500'}`}
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
                         >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
+                            {flash?.error ? (
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
+                            ) : (
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
+                            )}
                         </svg>
-                        <span>{flash.success}</span>
+                        <span>{flash?.success || flash?.error}</span>
                         <button
                             onClick={() => setShowFlash(false)}
-                            className="ml-auto text-green-500 hover:text-green-700"
+                            className={`ml-auto ${flash?.error ? 'text-red-500 hover:text-red-700' : 'text-green-500 hover:text-green-700'}`}
                         >
-                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            <svg
+                                className="h-4 w-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M6 18L18 6M6 6l12 12"
+                                />
                             </svg>
                         </button>
                     </div>
